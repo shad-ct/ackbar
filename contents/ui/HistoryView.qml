@@ -18,8 +18,8 @@ Window {
     flags: Qt.Dialog | Qt.WindowCloseButtonHint
 
     // Center on screen
-    width:  Math.min(480, Screen.desktopAvailableWidth  * 0.85)
-    height: Math.min(600, Screen.desktopAvailableHeight * 0.80)
+    width:  Math.min(500, Screen.desktopAvailableWidth  * 0.85)
+    height: Math.min(620, Screen.desktopAvailableHeight * 0.80)
     x: (Screen.desktopAvailableWidth  - width)  / 2 + Screen.virtualX
     y: (Screen.desktopAvailableHeight - height) / 2 + Screen.virtualY
 
@@ -35,13 +35,24 @@ Window {
 
     onClosing: historyWindow.closed()
 
+    // ── Search state ───────────────────────────────────────────────────────
+    property string searchQuery: ""
+
     // ── Internal computed model ────────────────────────────────────────────
 
+    // All days (unfiltered)
     property var days:          []
     property var dayRecordsMap: ({})   // dateKey → records[]
     property var dayTaskMap:    ({})   // dateKey → [{task,totalSeconds,pomodoroCount}]
 
+    // Filtered view — recalculated whenever searchQuery or the raw model changes
+    property var filteredDays:        []
+    property var filteredDayTaskMap:  ({})   // dateKey → filtered task array
+    property var filteredDayRecordsMap: ({}) // dateKey → filtered records[]
+
     onHistoryRecordsChanged: rebuildModel()
+    onSearchQueryChanged:    applyFilter()
+
     Component.onCompleted: {
         rebuildModel();
         show();
@@ -68,7 +79,54 @@ Window {
         days = d;
         dayRecordsMap = dr;
         dayTaskMap    = dt;
+        applyFilter();
     }
+
+    // Filter task groups and record lists by searchQuery (case-insensitive substring)
+    function applyFilter() {
+        var q = searchQuery.trim().toLowerCase();
+
+        if (q === "") {
+            // No filter — show everything
+            filteredDays        = days;
+            filteredDayTaskMap  = dayTaskMap;
+            filteredDayRecordsMap = dayRecordsMap;
+            return;
+        }
+
+        var fd = [], fdt = {}, fdr = {};
+        for (var i = 0; i < days.length; i++) {
+            var key = days[i];
+            var tasks = dayTaskMap[key] || [];
+            var recs  = dayRecordsMap[key] || [];
+
+            // Keep tasks whose name contains the query
+            var matchedTasks = tasks.filter(function(t) {
+                return (t.task || "").toLowerCase().indexOf(q) !== -1
+                    || (q === "(no task)" && !t.task);
+            });
+
+            if (matchedTasks.length === 0) continue;
+
+            // Keep only the records belonging to matched tasks
+            var matchedTaskNames = matchedTasks.map(function(t) { return t.task || ""; });
+            var matchedRecs = recs.filter(function(r) {
+                return matchedTaskNames.indexOf(r.task || "") !== -1;
+            });
+
+            fd.push(key);
+            fdt[key] = matchedTasks;
+            fdr[key] = matchedRecs;
+        }
+
+        filteredDays        = fd;
+        filteredDayTaskMap  = fdt;
+        filteredDayRecordsMap = fdr;
+    }
+
+    // Convenience: are there any results right now?
+    readonly property bool hasAnyHistory: days.length > 0
+    readonly property bool hasFilteredResults: filteredDays.length > 0
 
     // ── Confirmation state ─────────────────────────────────────────────────
     property bool confirmingClear: false
@@ -104,7 +162,7 @@ Window {
                     ? i18n("Cancel")
                     : i18n("Clear History")
                 icon.name: historyWindow.confirmingClear ? "dialog-cancel" : "edit-delete"
-                enabled: historyWindow.days.length > 0 || historyWindow.confirmingClear
+                enabled: historyWindow.hasAnyHistory || historyWindow.confirmingClear
                 onClicked: historyWindow.confirmingClear = !historyWindow.confirmingClear
 
                 QQC2.ToolTip.text: historyWindow.confirmingClear
@@ -128,6 +186,67 @@ Window {
 
         Kirigami.Separator { Layout.fillWidth: true }
 
+        // ── Search bar ─────────────────────────────────────────────────────
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.smallSpacing
+            visible: historyWindow.hasAnyHistory
+
+            Kirigami.Icon {
+                source: "system-search"
+                implicitWidth:  Kirigami.Units.iconSizes.small
+                implicitHeight: Kirigami.Units.iconSizes.small
+                opacity: searchField.activeFocus ? 1.0 : 0.5
+            }
+
+            QQC2.TextField {
+                id: searchField
+                Layout.fillWidth: true
+                placeholderText: i18n("Search tasks…")
+                text: historyWindow.searchQuery
+
+                onTextChanged: historyWindow.searchQuery = text
+
+                // Esc clears the search
+                Keys.onEscapePressed: {
+                    historyWindow.searchQuery = "";
+                    text = "";
+                }
+
+                background: Rectangle {
+                    radius: 4
+                    color: searchField.activeFocus
+                        ? Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                  Kirigami.Theme.highlightColor.g,
+                                  Kirigami.Theme.highlightColor.b, 0.12)
+                        : Qt.rgba(Kirigami.Theme.textColor.r,
+                                  Kirigami.Theme.textColor.g,
+                                  Kirigami.Theme.textColor.b, 0.06)
+                    border.color: searchField.activeFocus
+                        ? Kirigami.Theme.highlightColor
+                        : "transparent"
+                    border.width: 1
+                }
+            }
+
+            // Clear search ×
+            PlasmaComponents3.ToolButton {
+                icon.name: "edit-clear"
+                display: PlasmaComponents3.AbstractButton.IconOnly
+                text: i18n("Clear search")
+                visible: historyWindow.searchQuery !== ""
+                onClicked: {
+                    historyWindow.searchQuery = "";
+                    searchField.text = "";
+                    searchField.forceActiveFocus();
+                }
+
+                QQC2.ToolTip.text: i18n("Clear search")
+                QQC2.ToolTip.visible: hovered
+                QQC2.ToolTip.delay: 300
+            }
+        }
+
         // ── Confirmation banner ────────────────────────────────────────────
         Kirigami.InlineMessage {
             Layout.fillWidth: true
@@ -146,26 +265,36 @@ Window {
             ]
         }
 
-        // ── Empty state ────────────────────────────────────────────────────
+        // ── Empty state: no history at all ─────────────────────────────────
         PlasmaExtras.PlaceholderMessage {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            visible: historyWindow.days.length === 0
+            visible: !historyWindow.hasAnyHistory
             iconName: "chronometer"
             text: i18n("No completed sessions yet")
             explanation: i18n("Complete a Pomodoro to start recording your focus history.")
         }
 
+        // ── Empty state: search returned nothing ───────────────────────────
+        PlasmaExtras.PlaceholderMessage {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: historyWindow.hasAnyHistory && !historyWindow.hasFilteredResults
+            iconName: "system-search"
+            text: i18n("No results for "%1"", historyWindow.searchQuery)
+            explanation: i18n("Try a different search term or clear the search.")
+        }
+
         // ── History scroll list ────────────────────────────────────────────
         QQC2.ScrollView {
-            visible: historyWindow.days.length > 0
+            visible: historyWindow.hasFilteredResults
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
 
             ListView {
                 id: dayListView
-                model: historyWindow.days
+                model: historyWindow.filteredDays
                 spacing: 0
 
                 delegate: ColumnLayout {
@@ -182,7 +311,7 @@ Window {
                         Layout.fillWidth: true
                         label: Stats.formatDayLabel(dayDelegate.modelData)
 
-                        // Daily stats on the right
+                        // Daily stats on the right (from unfiltered records so totals are accurate)
                         QQC2.Label {
                             visible: historyWindow.showDailyStats
                             anchors.right: parent.right
@@ -191,7 +320,8 @@ Window {
                             font: Kirigami.Theme.smallFont
                             opacity: 0.8
                             text: {
-                                var rec = historyWindow.dayRecordsMap[dayDelegate.modelData] || [];
+                                // Use filtered records when a search is active so stats match visible items
+                                var rec = historyWindow.filteredDayRecordsMap[dayDelegate.modelData] || [];
                                 return "🎯 " + Stats.formatDuration(Stats.getTotalFocusedSeconds(rec))
                                      + "  🍅 " + Stats.getTotalPomodoroCount(rec);
                             }
@@ -201,7 +331,7 @@ Window {
                     // ── Task groups for this day ───────────────────────────
 
                     Repeater {
-                        model: historyWindow.dayTaskMap[dayDelegate.modelData] || []
+                        model: historyWindow.filteredDayTaskMap[dayDelegate.modelData] || []
 
                         delegate: ColumnLayout {
                             id: taskDelegate
@@ -228,6 +358,7 @@ Window {
                                     }
                                     spacing: Kirigami.Units.smallSpacing
 
+                                    // Highlight matching part of task name
                                     QQC2.Label {
                                         text: taskDelegate.modelData.task || i18n("(no task)")
                                         font.bold: true
@@ -252,12 +383,13 @@ Window {
                             Repeater {
                                 id: sessionRepeater
                                 model: {
-                                    var dayRec = historyWindow.dayRecordsMap[taskDelegate.capturedDateKey] || [];
+                                    // Use filtered record map so deleted/searched records stay consistent
+                                    var dayRec = historyWindow.filteredDayRecordsMap[taskDelegate.capturedDateKey] || [];
                                     var taskName = taskDelegate.modelData.task;
                                     var out = [];
                                     for (var i = 0; i < dayRec.length; i++) {
                                         var r = dayRec[i];
-                                        if ((r.task || "") === taskName || (!r.task && !taskName)) {
+                                        if ((r.task || "") === (taskName || "")) {
                                             out.push(r);
                                         }
                                     }
