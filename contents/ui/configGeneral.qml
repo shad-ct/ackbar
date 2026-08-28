@@ -25,6 +25,7 @@ KCM.SimpleKCM {
     property int cfg_pomodoroMinutes
     property int cfg_restMinutes
     property color cfg_restColor
+    property color cfg_pauseColor
     // AckBar+ history & notification settings
     property bool cfg_enableHistory
     property bool cfg_trackPomodoros
@@ -33,6 +34,7 @@ KCM.SimpleKCM {
     property bool cfg_enableNotificationSound
     property bool cfg_soundOnPomodoroComplete
     property bool cfg_soundOnBreakComplete
+    property int  cfg_pausedMsRemaining
 
     function resetAllSettings() {
         placeholderField.text = "";
@@ -51,6 +53,7 @@ KCM.SimpleKCM {
         cfg_pomodoroMinutes = 20;
         cfg_restMinutes = 5;
         cfg_restColor = "#95a5a6";
+        cfg_pauseColor = "#e67e22";
         // AckBar+ defaults
         cfg_enableHistory = true;
         cfg_trackPomodoros = true;
@@ -59,6 +62,7 @@ KCM.SimpleKCM {
         cfg_enableNotificationSound = false;
         cfg_soundOnPomodoroComplete = true;
         cfg_soundOnBreakComplete = true;
+        cfg_pausedMsRemaining = 0;
     }
 
     function syncFontColor() {

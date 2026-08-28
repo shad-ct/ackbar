@@ -51,6 +51,9 @@
         <entry name="restColor" type="Color">
             <default>#95a5a6</default>
         </entry>
+        <entry name="pauseColor" type="Color">
+            <default>#e67e22</default>
+        </entry>
         <entry name="pomodoroPhase" type="String">
             <default></default>
         </entry>
@@ -98,6 +101,10 @@
         <!-- Timestamp (ms) when the current work/rest phase started — for duration calc -->
         <entry name="phaseStartedAt" type="String">
             <default></default>
+        </entry>
+        <!-- Milliseconds remaining when the work phase was paused (0 = not paused) -->
+        <entry name="pausedMsRemaining" type="Int">
+            <default>0</default>
         </entry>
         <!-- Serialized history: JSON string containing the full history array.
              Format: {"version":1,"records":[{id,task,startedAt,endedAt,durationSeconds,pomodorosCompleted,type},...]}

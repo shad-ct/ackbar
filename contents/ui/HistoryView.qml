@@ -7,14 +7,23 @@ import org.kde.plasma.components as PlasmaComponents3
 import org.kde.plasma.extras as PlasmaExtras
 import "../js/statistics.js" as Stats
 
-// HistoryView.qml — AckBar+ history & statistics dialog
+// HistoryView.qml — AckBar+ history & statistics window
 // Instantiated lazily via a Loader in main.qml.
 // Signals: deleteRecord(id), clearHistory()
 
-Kirigami.Dialog {
-    id: historyDialog
+Window {
+    id: historyWindow
 
-    title: i18n("Session History")
+    title: i18n("Session History — AckBar+")
+    flags: Qt.Dialog | Qt.WindowCloseButtonHint
+
+    // Center on screen
+    width:  Math.min(480, Screen.desktopAvailableWidth  * 0.85)
+    height: Math.min(600, Screen.desktopAvailableHeight * 0.80)
+    x: (Screen.desktopAvailableWidth  - width)  / 2 + Screen.virtualX
+    y: (Screen.desktopAvailableHeight - height) / 2 + Screen.virtualY
+
+    color: Kirigami.Theme.backgroundColor
 
     // Provided by main.qml binding through the Loader
     property var historyRecords: []
@@ -22,13 +31,9 @@ Kirigami.Dialog {
 
     signal deleteRecord(string id)
     signal clearHistory()
+    signal closed()
 
-    // Size: comfortable but not overwhelming
-    width:  Math.min(440, Screen.width  * 0.8)
-    height: Math.min(580, Screen.height * 0.75)
-
-    // Standard buttons — we add our own Clear button in the footer
-    standardButtons: Kirigami.Dialog.NoButton
+    onClosing: historyWindow.closed()
 
     // ── Internal computed model ────────────────────────────────────────────
 
@@ -37,7 +42,18 @@ Kirigami.Dialog {
     property var dayTaskMap:    ({})   // dateKey → [{task,totalSeconds,pomodoroCount}]
 
     onHistoryRecordsChanged: rebuildModel()
-    Component.onCompleted:   rebuildModel()
+    Component.onCompleted: {
+        rebuildModel();
+        show();
+        raise();
+        requestActivate();
+    }
+
+    function open() {
+        show();
+        raise();
+        requestActivate();
+    }
 
     function rebuildModel() {
         var records = historyRecords || [];
@@ -57,33 +73,65 @@ Kirigami.Dialog {
     // ── Confirmation state ─────────────────────────────────────────────────
     property bool confirmingClear: false
 
-    // ── Footer buttons ─────────────────────────────────────────────────────
+    // ── Root layout ────────────────────────────────────────────────────────
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: Kirigami.Units.largeSpacing
+        spacing: Kirigami.Units.smallSpacing
 
-    customFooterActions: [
-        Kirigami.Action {
-            text: historyDialog.confirmingClear ? i18n("Cancel clear") : i18n("Clear History")
-            icon.name: historyDialog.confirmingClear ? "dialog-cancel" : "edit-delete"
-            enabled: historyDialog.days.length > 0 || historyDialog.confirmingClear
-            onTriggered: {
-                if (historyDialog.confirmingClear) {
-                    historyDialog.confirmingClear = false;
-                } else {
-                    historyDialog.confirmingClear = true;
-                }
+        // ── Title bar ──────────────────────────────────────────────────────
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.smallSpacing
+
+            Kirigami.Icon {
+                source: "view-history"
+                implicitWidth:  Kirigami.Units.iconSizes.small
+                implicitHeight: Kirigami.Units.iconSizes.small
+            }
+
+            QQC2.Label {
+                text: i18n("Session History")
+                font.bold: true
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
+                Layout.fillWidth: true
+            }
+
+            // Clear button
+            PlasmaComponents3.ToolButton {
+                id: clearBtn
+                text: historyWindow.confirmingClear
+                    ? i18n("Cancel")
+                    : i18n("Clear History")
+                icon.name: historyWindow.confirmingClear ? "dialog-cancel" : "edit-delete"
+                enabled: historyWindow.days.length > 0 || historyWindow.confirmingClear
+                onClicked: historyWindow.confirmingClear = !historyWindow.confirmingClear
+
+                QQC2.ToolTip.text: historyWindow.confirmingClear
+                    ? i18n("Cancel clear")
+                    : i18n("Clear all history")
+                QQC2.ToolTip.visible: hovered
+                QQC2.ToolTip.delay: 500
+            }
+
+            PlasmaComponents3.ToolButton {
+                icon.name: "window-close"
+                display: PlasmaComponents3.AbstractButton.IconOnly
+                text: i18n("Close")
+                onClicked: historyWindow.close()
+
+                QQC2.ToolTip.text: i18n("Close")
+                QQC2.ToolTip.visible: hovered
+                QQC2.ToolTip.delay: 500
             }
         }
-    ]
 
-    // ── Content ────────────────────────────────────────────────────────────
+        Kirigami.Separator { Layout.fillWidth: true }
 
-    ColumnLayout {
-        spacing: 0
-        implicitWidth: historyDialog.width - Kirigami.Units.largeSpacing * 2
-
-        // Confirmation banner
+        // ── Confirmation banner ────────────────────────────────────────────
         Kirigami.InlineMessage {
             Layout.fillWidth: true
-            visible: historyDialog.confirmingClear
+            visible: historyWindow.confirmingClear
             type: Kirigami.MessageType.Warning
             text: i18n("This permanently deletes all recorded sessions.")
             actions: [
@@ -91,34 +139,33 @@ Kirigami.Dialog {
                     text: i18n("Confirm: Clear All")
                     icon.name: "edit-delete"
                     onTriggered: {
-                        historyDialog.confirmingClear = false;
-                        historyDialog.clearHistory();
+                        historyWindow.confirmingClear = false;
+                        historyWindow.clearHistory();
                     }
                 }
             ]
         }
 
-        // Empty state
+        // ── Empty state ────────────────────────────────────────────────────
         PlasmaExtras.PlaceholderMessage {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            visible: historyDialog.days.length === 0
+            visible: historyWindow.days.length === 0
             iconName: "chronometer"
             text: i18n("No completed sessions yet")
             explanation: i18n("Complete a Pomodoro to start recording your focus history.")
         }
 
-        // History scroll list
+        // ── History scroll list ────────────────────────────────────────────
         QQC2.ScrollView {
-            visible: historyDialog.days.length > 0
+            visible: historyWindow.days.length > 0
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredHeight: historyDialog.height - Kirigami.Units.gridUnit * 5
             clip: true
 
             ListView {
                 id: dayListView
-                model: historyDialog.days
+                model: historyWindow.days
                 spacing: 0
 
                 delegate: ColumnLayout {
@@ -129,7 +176,7 @@ Kirigami.Dialog {
                     required property string modelData  // dateKey
                     required property int index
 
-                    // ── Day header ────────────────────────────────────────
+                    // ── Day header ─────────────────────────────────────────
 
                     PlasmaExtras.ListSectionHeader {
                         Layout.fillWidth: true
@@ -137,14 +184,14 @@ Kirigami.Dialog {
 
                         // Daily stats on the right
                         QQC2.Label {
-                            visible: historyDialog.showDailyStats
+                            visible: historyWindow.showDailyStats
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.rightMargin: Kirigami.Units.largeSpacing
                             font: Kirigami.Theme.smallFont
                             opacity: 0.8
                             text: {
-                                var rec = historyDialog.dayRecordsMap[dayDelegate.modelData] || [];
+                                var rec = historyWindow.dayRecordsMap[dayDelegate.modelData] || [];
                                 return "🎯 " + Stats.formatDuration(Stats.getTotalFocusedSeconds(rec))
                                      + "  🍅 " + Stats.getTotalPomodoroCount(rec);
                             }
@@ -154,7 +201,7 @@ Kirigami.Dialog {
                     // ── Task groups for this day ───────────────────────────
 
                     Repeater {
-                        model: historyDialog.dayTaskMap[dayDelegate.modelData] || []
+                        model: historyWindow.dayTaskMap[dayDelegate.modelData] || []
 
                         delegate: ColumnLayout {
                             id: taskDelegate
@@ -205,7 +252,7 @@ Kirigami.Dialog {
                             Repeater {
                                 id: sessionRepeater
                                 model: {
-                                    var dayRec = historyDialog.dayRecordsMap[taskDelegate.capturedDateKey] || [];
+                                    var dayRec = historyWindow.dayRecordsMap[taskDelegate.capturedDateKey] || [];
                                     var taskName = taskDelegate.modelData.task;
                                     var out = [];
                                     for (var i = 0; i < dayRec.length; i++) {
@@ -254,7 +301,7 @@ Kirigami.Dialog {
                                             opacity: 0.65
                                             implicitWidth:  Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
                                             implicitHeight: implicitWidth
-                                            onClicked: historyDialog.deleteRecord(sessionDelegate.modelData.id)
+                                            onClicked: historyWindow.deleteRecord(sessionDelegate.modelData.id)
 
                                             QQC2.ToolTip.text: i18n("Delete this session")
                                             QQC2.ToolTip.visible: hovered

@@ -7,13 +7,15 @@ import org.kde.kquickcontrols as KQuickControls
 
 KCM.SimpleKCM {
     // Keep in sync with the defaults in config/main.xml
-    readonly property color defaultRestColor: "#95a5a6"
+    readonly property color defaultRestColor:  "#95a5a6"
+    readonly property color defaultPauseColor: "#e67e22"
     readonly property int defaultPomodoroMinutes: 20
     readonly property int defaultRestMinutes: 5
     property alias cfg_pomodoroEnabled: enabledCheck.checked
     property alias cfg_pomodoroMinutes: workSpin.value
-    property alias cfg_restMinutes: restSpin.value
-    property alias cfg_restColor: restColorButton.color
+    property alias cfg_restMinutes:     restSpin.value
+    property alias cfg_restColor:       restColorButton.color
+    property alias cfg_pauseColor:      pauseColorButton.color
 
     Kirigami.FormLayout {
         QQC2.CheckBox {
@@ -81,6 +83,27 @@ KCM.SimpleKCM {
             ColorSwatches {
                 enabled: enabledCheck.checked
                 onPicked: c => restColorButton.color = c
+            }
+        }
+
+        RowLayout {
+            Kirigami.FormData.label: i18n("Pause bar color:")
+
+            KQuickControls.ColorButton {
+                id: pauseColorButton
+                enabled: enabledCheck.checked
+            }
+
+            QQC2.Button {
+                text: i18n("Reset to default")
+                enabled: enabledCheck.checked
+                    && !Qt.colorEqual(pauseColorButton.color, defaultPauseColor)
+                onClicked: pauseColorButton.color = defaultPauseColor
+            }
+
+            ColorSwatches {
+                enabled: enabledCheck.checked
+                onPicked: c => pauseColorButton.color = c
             }
         }
 

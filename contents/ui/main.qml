@@ -21,25 +21,35 @@ PlasmoidItem {
             onTriggered: plasmoid.configuration.pomodoroEnabled = checked
         },
         PlasmaCore.Action {
-            text: i18n("Rest now")
-            icon.name: "media-playback-pause"
+            text: root.pomodoroPaused ? i18n("Resume Focus") : i18n("Pause Focus")
+            icon.name: root.pomodoroPaused ? "media-playback-start" : "media-playback-pause"
             visible: root.pomodoroActive && root.pomodoroPhase.startsWith("work")
+            onTriggered: {
+                if (root.pomodoroPaused) root.resumePomodoro();
+                else root.pausePomodoro();
+            }
+        },
+        PlasmaCore.Action {
+            text: i18n("Rest now")
+            icon.name: "coffee"
+            visible: root.pomodoroActive && root.pomodoroPhase.startsWith("work") && !root.pomodoroPaused
             onTriggered: root.startRest(root.restDurationMs)
         },
         PlasmaCore.Action {
             text: i18n("Restart pomodoro")
             icon.name: "view-refresh"
             visible: root.pomodoroActive
-            onTriggered: root.startWork(Math.max(1, root.pomodoroCount))
+            onTriggered: {
+                root.pomodoroPaused = false;
+                plasmoid.configuration.pausedMsRemaining = 0;
+                root.startWork(Math.max(1, root.pomodoroCount));
+            }
         },
         PlasmaCore.Action {
             text: i18n("History…")
             icon.name: "view-history"
             visible: plasmoid.configuration.enableHistory
-            onTriggered: {
-                historyLoader.active = true;
-                historyLoader.item.open();
-            }
+            onTriggered: historyLoader.open()
         }
     ]
 
@@ -65,6 +75,7 @@ PlasmoidItem {
     readonly property int pomodoroCount: plasmoid.configuration.pomodoroCount
     readonly property bool pomodoroActive: pomodoroEnabled && hasTask && pomodoroPhase !== ""
     property string pomodoroText: ""
+    property bool pomodoroPaused: false
     signal pomodoroPhaseExpired(string endedPhase)
 
     // Compressed durations for manual testing: 20s work / 15s rest / 10s snooze.
@@ -110,6 +121,25 @@ PlasmoidItem {
         plasmoid.configuration.phaseEndsAt = "";
         plasmoid.configuration.phaseStartedAt = "";
         plasmoid.configuration.pomodoroCount = 0;
+        pomodoroPaused = false;
+        plasmoid.configuration.pausedMsRemaining = 0;
+    }
+
+    function pausePomodoro() {
+        if (pomodoroPaused) return;
+        var remaining = Number(plasmoid.configuration.phaseEndsAt) - Date.now();
+        plasmoid.configuration.pausedMsRemaining = Math.max(0, remaining);
+        plasmoid.configuration.phaseEndsAt = String(Date.now() + 365 * 24 * 3600 * 1000); // park far in future
+        pomodoroPaused = true;
+    }
+
+    function resumePomodoro() {
+        if (!pomodoroPaused) return;
+        var remaining = plasmoid.configuration.pausedMsRemaining;
+        if (remaining <= 0) remaining = workDurationMs;
+        plasmoid.configuration.phaseEndsAt = String(Date.now() + remaining);
+        plasmoid.configuration.pausedMsRemaining = 0;
+        pomodoroPaused = false;
     }
 
     function formatMMSS(secs) {
@@ -123,6 +153,14 @@ PlasmoidItem {
             pomodoroText = "";
             return;
         }
+        // If paused, show frozen remaining time without expiry check
+        if (pomodoroPaused) {
+            const remaining = plasmoid.configuration.pausedMsRemaining;
+            const secs = Math.max(0, Math.floor(remaining / 1000));
+            pomodoroText = `⏸ 🍅x${pomodoroCount} ${formatMMSS(secs)}`;
+            return;
+        }
+
         const endsAt = Number(plasmoid.configuration.phaseEndsAt);
         const now = Date.now();
         const phase = pomodoroPhase;
@@ -219,13 +257,21 @@ PlasmoidItem {
         onTriggered: root.soundReady = true
     }
 
-    // Play a sound using paplay (available on PulseAudio/PipeWire systems).
-    // We use Qt.openUrlExternally on a "run:" scheme is not available.
-    // Instead we create a short-lived process via a QML WorkerScript or
-    // leverage the system notification sound that the Notification component
-    // already triggers. Since Notification.Persistent notifications produce
-    // the system event sound via KNotification's sound framework, we send
-    // a transient sound-only notification for the explicit sound request.
+    // Play an alarm-style sound using KNotification's "alarm" event.
+    // The "alarm" eventId maps to a dedicated sound in most KDE sound themes
+    // (oxygen, breeze-sounds) and is distinct from a plain "notification" ping.
+    // We send it at CriticalUrgency so the daemon does not suppress it.
+    Notification {
+        id: alarmNotification
+        componentName: "plasma_workspace"
+        eventId: "alarm"
+        title: ""
+        text: ""
+        flags: Notification.CloseOnTimeout
+        urgency: Notification.CriticalUrgency
+    }
+
+    // Fallback: send a plain notification event if "alarm" is unavailable.
     Notification {
         id: soundOnlyNotification
         componentName: "plasma_workspace"
@@ -233,13 +279,14 @@ PlasmoidItem {
         title: ""
         text: ""
         flags: Notification.CloseOnTimeout
-        urgency: Notification.LowUrgency
+        urgency: Notification.NormalUrgency
     }
 
     function playCompletionSound() {
         if (!root.soundReady) return;
         if (!plasmoid.configuration.enableNotificationSound) return;
-        soundOnlyNotification.sendEvent();
+        // Use the alarm event which triggers the KDE alarm/ringtone sound
+        alarmNotification.sendEvent();
     }
 
     // ── Notifications (existing, preserved) ───────────────────────────────
@@ -365,6 +412,8 @@ PlasmoidItem {
     }
 
     // ── History dialog (lazy-loaded) ───────────────────────────────────────
+    // We expose an open() helper that activates the Loader and then opens the
+    // dialog once the item is ready (avoids a race where item is still null).
 
     Loader {
         id: historyLoader
@@ -376,6 +425,17 @@ PlasmoidItem {
             onDeleteRecord: function(id) { root.doDeleteRecord(id); }
             onClearHistory: function()   { root.doClearHistory();   }
             onClosed:       function()   { historyLoader.active = false; }
+
+            Component.onCompleted: open()
+        }
+
+        function open() {
+            if (!active) {
+                active = true;
+                // Item will call open() via Component.onCompleted above
+            } else if (item) {
+                item.open();
+            }
         }
     }
 
@@ -457,12 +517,30 @@ PlasmoidItem {
             anchors.leftMargin: root.vertical ? 2 : 0
             anchors.rightMargin: root.vertical ? 2 : 0
             radius: Math.min(width, height) / 2
-            color: root.pomodoroActive && root.pomodoroPhase.startsWith("rest")
-                ? plasmoid.configuration.restColor
-                : plasmoid.configuration.barColor
-            // Full opacity with a task: the bar shows exactly the picked
-            // color. Translucency only for the idle nudge.
-            opacity: root.hasTask ? 1.0 : 0.05
+
+            // ── Bar color per state ───────────────────────────────────────
+            // paused       → amber pause color
+            // workEnded    → work color at reduced opacity (overtime)
+            // restEnded    → rest color at reduced opacity (overtime)
+            // rest/restEnded → restColor
+            // work/idle    → barColor
+            color: {
+                if (root.pomodoroPaused)
+                    return plasmoid.configuration.pauseColor;
+                const ph = plasmoid.configuration.pomodoroPhase;
+                if (ph === "rest" || ph === "restEnded")
+                    return plasmoid.configuration.restColor;
+                return plasmoid.configuration.barColor;
+            }
+
+            // Full opacity with a task; dim slightly during overtime;
+            // very translucent when idle.
+            opacity: {
+                if (!root.hasTask) return 0.05;
+                const ph = plasmoid.configuration.pomodoroPhase;
+                if (ph === "workEnded" || ph === "restEnded") return 0.55;
+                return 1.0;
+            }
 
             Behavior on opacity {
                 NumberAnimation { duration: Kirigami.Units.longDuration }
