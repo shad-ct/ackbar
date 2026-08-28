@@ -17,4 +17,9 @@ ConfigModel {
         icon: "chronometer"
         source: "configPomodoro.qml"
     }
+    ConfigCategory {
+        name: i18n("History & Sounds")
+        icon: "view-history"
+        source: "configHistory.qml"
+    }
 }

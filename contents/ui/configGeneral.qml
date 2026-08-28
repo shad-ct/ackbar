@@ -16,8 +16,8 @@ KCM.SimpleKCM {
     property string cfg_fontFamily
 
     // No controls here — declared so "Reset all settings" can restore the
-    // Blink reminder and Pomodoro pages' keys too. Defaults must match
-    // config/main.xml.
+    // Blink reminder, Pomodoro, and History pages' keys too. Defaults must
+    // match config/main.xml.
     property bool cfg_blinkEnabled
     property int cfg_blinkIntervalMinutes
     property color cfg_blinkColor
@@ -25,6 +25,14 @@ KCM.SimpleKCM {
     property int cfg_pomodoroMinutes
     property int cfg_restMinutes
     property color cfg_restColor
+    // AckBar+ history & notification settings
+    property bool cfg_enableHistory
+    property bool cfg_trackPomodoros
+    property bool cfg_trackTasks
+    property bool cfg_showDailyStats
+    property bool cfg_enableNotificationSound
+    property bool cfg_soundOnPomodoroComplete
+    property bool cfg_soundOnBreakComplete
 
     function resetAllSettings() {
         placeholderField.text = "";
@@ -43,6 +51,14 @@ KCM.SimpleKCM {
         cfg_pomodoroMinutes = 20;
         cfg_restMinutes = 5;
         cfg_restColor = "#95a5a6";
+        // AckBar+ defaults
+        cfg_enableHistory = true;
+        cfg_trackPomodoros = true;
+        cfg_trackTasks = true;
+        cfg_showDailyStats = true;
+        cfg_enableNotificationSound = false;
+        cfg_soundOnPomodoroComplete = true;
+        cfg_soundOnBreakComplete = true;
     }
 
     function syncFontColor() {
