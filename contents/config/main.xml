@@ -5,6 +5,7 @@
       http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <kcfgfile name=""/>
     <group name="General">
+        <!-- ── Existing keys — do NOT rename or reorder ───────────────────── -->
         <entry name="taskText" type="String">
             <default></default>
         </entry>
@@ -58,6 +59,52 @@
         </entry>
         <entry name="pomodoroCount" type="Int">
             <default>0</default>
+        </entry>
+
+        <!-- ── AckBar+ new keys ───────────────────────────────────────────── -->
+
+        <!-- History tracking master switch -->
+        <entry name="enableHistory" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- Track completed Pomodoros in history -->
+        <entry name="trackPomodoros" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- Track task names alongside Pomodoro records -->
+        <entry name="trackTasks" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- Show daily statistics panel in the history view -->
+        <entry name="showDailyStats" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- Enable notification sounds -->
+        <entry name="enableNotificationSound" type="Bool">
+            <default>false</default>
+        </entry>
+        <!-- Play sound when a work Pomodoro finishes -->
+        <entry name="soundOnPomodoroComplete" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- Play sound when a break finishes -->
+        <entry name="soundOnBreakComplete" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- Dedup guard: id of the last Pomodoro record that was persisted -->
+        <entry name="lastRecordedPomodoroId" type="String">
+            <default></default>
+        </entry>
+        <!-- Timestamp (ms) when the current work/rest phase started — for duration calc -->
+        <entry name="phaseStartedAt" type="String">
+            <default></default>
+        </entry>
+        <!-- Serialized history: JSON string containing the full history array.
+             Format: {"version":1,"records":[{id,task,startedAt,endedAt,durationSeconds,pomodorosCompleted,type},...]}
+             Stored as a KConfig String to avoid requiring an external file API.
+             The empty default triggers graceful initialization to an empty array. -->
+        <entry name="historyJson" type="String">
+            <default></default>
         </entry>
     </group>
 </kcfg>
