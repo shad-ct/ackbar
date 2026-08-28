@@ -15,18 +15,21 @@ Window {
     id: historyWindow
 
     title: i18n("Session History — AckBar+")
-    flags: Qt.Dialog | Qt.WindowCloseButtonHint
+    flags: Qt.Dialog | Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint
 
     // Center on screen
-    width:  Math.min(500, Screen.desktopAvailableWidth  * 0.85)
-    height: Math.min(620, Screen.desktopAvailableHeight * 0.80)
+    width:  Math.min(520, Screen.desktopAvailableWidth  * 0.85)
+    height: Math.min(640, Screen.desktopAvailableHeight * 0.85)
     x: (Screen.desktopAvailableWidth  - width)  / 2 + Screen.virtualX
     y: (Screen.desktopAvailableHeight - height) / 2 + Screen.virtualY
+
+    minimumWidth:  380
+    minimumHeight: 320
 
     color: Kirigami.Theme.backgroundColor
 
     // Provided by main.qml binding through the Loader
-    property var historyRecords: []
+    property var  historyRecords: []
     property bool showDailyStats: true
 
     signal deleteRecord(string id)
@@ -35,23 +38,22 @@ Window {
 
     onClosing: historyWindow.closed()
 
-    // ── Search state ───────────────────────────────────────────────────────
+    // ── Search / filter state ──────────────────────────────────────────────────
     property string searchQuery: ""
 
-    // ── Internal computed model ────────────────────────────────────────────
+    // ── Internal computed model ────────────────────────────────────────────────
+    //   Filtered by searchQuery; rebuilt whenever records or query change.
 
-    // All days (unfiltered)
     property var days:          []
-    property var dayRecordsMap: ({})   // dateKey → records[]
+    property var dayRecordsMap: ({})   // dateKey → filtered records[]
     property var dayTaskMap:    ({})   // dateKey → [{task,totalSeconds,pomodoroCount}]
 
-    // Filtered view — recalculated whenever searchQuery or the raw model changes
-    property var filteredDays:        []
-    property var filteredDayTaskMap:  ({})   // dateKey → filtered task array
-    property var filteredDayRecordsMap: ({}) // dateKey → filtered records[]
+    // Grand total stats across filtered records
+    property int totalSeconds:   0
+    property int totalPomodoros: 0
 
     onHistoryRecordsChanged: rebuildModel()
-    onSearchQueryChanged:    applyFilter()
+    onSearchQueryChanged:    rebuildModel()
 
     Component.onCompleted: {
         rebuildModel();
@@ -68,76 +70,43 @@ Window {
 
     function rebuildModel() {
         var records = historyRecords || [];
-        var d = Stats.getUniqueDays(records);
-        var dr = {}, dt = {};
+
+        // Apply search filter
+        var q = searchQuery.trim().toLowerCase();
+        var filtered = q === "" ? records : records.filter(function(r) {
+            return (r.task || "").toLowerCase().indexOf(q) !== -1;
+        });
+
+        var d   = Stats.getUniqueDays(filtered);
+        var dr  = {}, dt = {};
+        var sec = 0, pom = 0;
+
         for (var i = 0; i < d.length; i++) {
-            var key = d[i];
-            var dayRec = Stats.getRecordsForDay(records, key);
+            var key    = d[i];
+            var dayRec = Stats.getRecordsForDay(filtered, key);
             dr[key] = dayRec;
             dt[key] = Stats.getTaskTotals(dayRec);
+            sec += Stats.getTotalFocusedSeconds(dayRec);
+            pom += Stats.getTotalPomodoroCount(dayRec);
         }
-        days = d;
+
+        days          = d;
         dayRecordsMap = dr;
         dayTaskMap    = dt;
-        applyFilter();
+        totalSeconds  = sec;
+        totalPomodoros = pom;
     }
 
-    // Filter task groups and record lists by searchQuery (case-insensitive substring)
-    function applyFilter() {
-        var q = searchQuery.trim().toLowerCase();
-
-        if (q === "") {
-            // No filter — show everything
-            filteredDays        = days;
-            filteredDayTaskMap  = dayTaskMap;
-            filteredDayRecordsMap = dayRecordsMap;
-            return;
-        }
-
-        var fd = [], fdt = {}, fdr = {};
-        for (var i = 0; i < days.length; i++) {
-            var key = days[i];
-            var tasks = dayTaskMap[key] || [];
-            var recs  = dayRecordsMap[key] || [];
-
-            // Keep tasks whose name contains the query
-            var matchedTasks = tasks.filter(function(t) {
-                return (t.task || "").toLowerCase().indexOf(q) !== -1
-                    || (q === "(no task)" && !t.task);
-            });
-
-            if (matchedTasks.length === 0) continue;
-
-            // Keep only the records belonging to matched tasks
-            var matchedTaskNames = matchedTasks.map(function(t) { return t.task || ""; });
-            var matchedRecs = recs.filter(function(r) {
-                return matchedTaskNames.indexOf(r.task || "") !== -1;
-            });
-
-            fd.push(key);
-            fdt[key] = matchedTasks;
-            fdr[key] = matchedRecs;
-        }
-
-        filteredDays        = fd;
-        filteredDayTaskMap  = fdt;
-        filteredDayRecordsMap = fdr;
-    }
-
-    // Convenience: are there any results right now?
-    readonly property bool hasAnyHistory: days.length > 0
-    readonly property bool hasFilteredResults: filteredDays.length > 0
-
-    // ── Confirmation state ─────────────────────────────────────────────────
+    // ── Confirmation state ─────────────────────────────────────────────────────
     property bool confirmingClear: false
 
-    // ── Root layout ────────────────────────────────────────────────────────
+    // ── Root layout ───────────────────────────────────────────────────────────
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Kirigami.Units.largeSpacing
         spacing: Kirigami.Units.smallSpacing
 
-        // ── Title bar ──────────────────────────────────────────────────────
+        // ── Title bar ─────────────────────────────────────────────────────────
         RowLayout {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
@@ -158,11 +127,9 @@ Window {
             // Clear button
             PlasmaComponents3.ToolButton {
                 id: clearBtn
-                text: historyWindow.confirmingClear
-                    ? i18n("Cancel")
-                    : i18n("Clear History")
+                text: historyWindow.confirmingClear ? i18n("Cancel") : i18n("Clear All")
                 icon.name: historyWindow.confirmingClear ? "dialog-cancel" : "edit-delete"
-                enabled: historyWindow.hasAnyHistory || historyWindow.confirmingClear
+                enabled: historyWindow.days.length > 0 || historyWindow.confirmingClear
                 onClicked: historyWindow.confirmingClear = !historyWindow.confirmingClear
 
                 QQC2.ToolTip.text: historyWindow.confirmingClear
@@ -186,73 +153,93 @@ Window {
 
         Kirigami.Separator { Layout.fillWidth: true }
 
-        // ── Search bar ─────────────────────────────────────────────────────
+        // ── Search bar ────────────────────────────────────────────────────────
         RowLayout {
             Layout.fillWidth: true
             spacing: Kirigami.Units.smallSpacing
-            visible: historyWindow.hasAnyHistory
+            visible: historyRecords.length > 0
 
             Kirigami.Icon {
-                source: "system-search"
+                source: "search"
                 implicitWidth:  Kirigami.Units.iconSizes.small
                 implicitHeight: Kirigami.Units.iconSizes.small
-                opacity: searchField.activeFocus ? 1.0 : 0.5
+                opacity: 0.6
             }
 
             QQC2.TextField {
                 id: searchField
                 Layout.fillWidth: true
-                placeholderText: i18n("Search tasks…")
+                placeholderText: i18n("Search by task name…")
                 text: historyWindow.searchQuery
-
                 onTextChanged: historyWindow.searchQuery = text
-
-                // Esc clears the search
                 Keys.onEscapePressed: {
-                    historyWindow.searchQuery = "";
                     text = "";
-                }
-
-                background: Rectangle {
-                    radius: 4
-                    color: searchField.activeFocus
-                        ? Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                  Kirigami.Theme.highlightColor.g,
-                                  Kirigami.Theme.highlightColor.b, 0.12)
-                        : Qt.rgba(Kirigami.Theme.textColor.r,
-                                  Kirigami.Theme.textColor.g,
-                                  Kirigami.Theme.textColor.b, 0.06)
-                    border.color: searchField.activeFocus
-                        ? Kirigami.Theme.highlightColor
-                        : "transparent"
-                    border.width: 1
-                }
-            }
-
-            // Clear search ×
-            PlasmaComponents3.ToolButton {
-                icon.name: "edit-clear"
-                display: PlasmaComponents3.AbstractButton.IconOnly
-                text: i18n("Clear search")
-                visible: historyWindow.searchQuery !== ""
-                onClicked: {
                     historyWindow.searchQuery = "";
-                    searchField.text = "";
-                    searchField.forceActiveFocus();
                 }
 
-                QQC2.ToolTip.text: i18n("Clear search")
-                QQC2.ToolTip.visible: hovered
-                QQC2.ToolTip.delay: 300
+                // Clear button inside field
+                rightPadding: clearSearchBtn.visible ? clearSearchBtn.width + 4 : 4
+
+                PlasmaComponents3.ToolButton {
+                    id: clearSearchBtn
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: searchField.text.length > 0
+                    icon.name: "edit-clear-locationbar-rtl"
+                    implicitWidth:  Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
+                    implicitHeight: implicitWidth
+                    onClicked: {
+                        searchField.text = "";
+                        historyWindow.searchQuery = "";
+                        searchField.forceActiveFocus();
+                    }
+                }
             }
         }
 
-        // ── Confirmation banner ────────────────────────────────────────────
+        // ── Grand-total stats pill ────────────────────────────────────────────
+        Rectangle {
+            Layout.fillWidth: true
+            visible: historyWindow.totalPomodoros > 0
+            implicitHeight: statsRow.implicitHeight + Kirigami.Units.smallSpacing * 2
+            radius: Kirigami.Units.cornerRadius
+            color: Qt.rgba(Kirigami.Theme.highlightColor.r,
+                           Kirigami.Theme.highlightColor.g,
+                           Kirigami.Theme.highlightColor.b, 0.10)
+
+            RowLayout {
+                id: statsRow
+                anchors.centerIn: parent
+                spacing: Kirigami.Units.largeSpacing * 2
+
+                QQC2.Label {
+                    font: Kirigami.Theme.smallFont
+                    opacity: 0.85
+                    text: "🎯 " + i18n("Total focus: %1",
+                              Stats.formatDuration(historyWindow.totalSeconds))
+                }
+                QQC2.Label {
+                    font: Kirigami.Theme.smallFont
+                    opacity: 0.85
+                    text: "🍅 " + i18np("%1 pomodoro", "%1 pomodoros",
+                              historyWindow.totalPomodoros)
+                }
+                QQC2.Label {
+                    visible: historyWindow.days.length > 0
+                    font: Kirigami.Theme.smallFont
+                    opacity: 0.85
+                    text: "📅 " + i18np("%1 day", "%1 days",
+                              historyWindow.days.length)
+                }
+            }
+        }
+
+        // ── Confirmation banner ───────────────────────────────────────────────
         Kirigami.InlineMessage {
             Layout.fillWidth: true
             visible: historyWindow.confirmingClear
             type: Kirigami.MessageType.Warning
-            text: i18n("This permanently deletes all recorded sessions.")
+            text: i18n("This permanently deletes ALL recorded sessions.")
             actions: [
                 Kirigami.Action {
                     text: i18n("Confirm: Clear All")
@@ -265,37 +252,41 @@ Window {
             ]
         }
 
-        // ── Empty state: no history at all ─────────────────────────────────
+        // ── Empty / no-results state ──────────────────────────────────────────
         PlasmaExtras.PlaceholderMessage {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            visible: !historyWindow.hasAnyHistory
-            iconName: "chronometer"
-            text: i18n("No completed sessions yet")
-            explanation: i18n("Complete a Pomodoro to start recording your focus history.")
+            visible: historyWindow.days.length === 0
+            iconName: historyWindow.searchQuery !== "" ? "search" : "chronometer"
+            text: historyWindow.searchQuery !== ""
+                ? i18n("No sessions match \"%1\"", historyWindow.searchQuery)
+                : i18n("No completed sessions yet")
+            explanation: historyWindow.searchQuery !== ""
+                ? i18n("Try a different search term.")
+                : i18n("Complete a Pomodoro to start recording your focus history.")
         }
 
-        // ── Empty state: search returned nothing ───────────────────────────
-        PlasmaExtras.PlaceholderMessage {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            visible: historyWindow.hasAnyHistory && !historyWindow.hasFilteredResults
-            iconName: "system-search"
-            text: i18n("No results for "%1"", historyWindow.searchQuery)
-            explanation: i18n("Try a different search term or clear the search.")
-        }
-
-        // ── History scroll list ────────────────────────────────────────────
+        // ── History scroll list ───────────────────────────────────────────────
         QQC2.ScrollView {
-            visible: historyWindow.hasFilteredResults
+            visible: historyWindow.days.length > 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
 
+            // Keyboard shortcut: Ctrl+F focuses search
+            Keys.onPressed: event => {
+                if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_F) {
+                    searchField.forceActiveFocus();
+                    event.accepted = true;
+                }
+            }
+
             ListView {
                 id: dayListView
-                model: historyWindow.filteredDays
+                model: historyWindow.days
                 spacing: 0
+                // Smooth scroll
+                boundsMovement: Flickable.StopAtBounds
 
                 delegate: ColumnLayout {
                     id: dayDelegate
@@ -305,13 +296,13 @@ Window {
                     required property string modelData  // dateKey
                     required property int index
 
-                    // ── Day header ─────────────────────────────────────────
+                    // ── Day header ────────────────────────────────────────────
 
                     PlasmaExtras.ListSectionHeader {
                         Layout.fillWidth: true
                         label: Stats.formatDayLabel(dayDelegate.modelData)
 
-                        // Daily stats on the right (from unfiltered records so totals are accurate)
+                        // Daily stats on the right
                         QQC2.Label {
                             visible: historyWindow.showDailyStats
                             anchors.right: parent.right
@@ -320,18 +311,17 @@ Window {
                             font: Kirigami.Theme.smallFont
                             opacity: 0.8
                             text: {
-                                // Use filtered records when a search is active so stats match visible items
-                                var rec = historyWindow.filteredDayRecordsMap[dayDelegate.modelData] || [];
+                                var rec = historyWindow.dayRecordsMap[dayDelegate.modelData] || [];
                                 return "🎯 " + Stats.formatDuration(Stats.getTotalFocusedSeconds(rec))
                                      + "  🍅 " + Stats.getTotalPomodoroCount(rec);
                             }
                         }
                     }
 
-                    // ── Task groups for this day ───────────────────────────
+                    // ── Task groups for this day ──────────────────────────────
 
                     Repeater {
-                        model: historyWindow.filteredDayTaskMap[dayDelegate.modelData] || []
+                        model: historyWindow.dayTaskMap[dayDelegate.modelData] || []
 
                         delegate: ColumnLayout {
                             id: taskDelegate
@@ -345,7 +335,15 @@ Window {
                             Rectangle {
                                 Layout.fillWidth: true
                                 implicitHeight: taskRow.implicitHeight + Kirigami.Units.smallSpacing * 2
-                                color: "transparent"
+                                color: taskHover.containsMouse
+                                    ? Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                              Kirigami.Theme.highlightColor.g,
+                                              Kirigami.Theme.highlightColor.b, 0.07)
+                                    : "transparent"
+
+                                Behavior on color { ColorAnimation { duration: 80 } }
+
+                                HoverHandler { id: taskHover }
 
                                 RowLayout {
                                     id: taskRow
@@ -358,12 +356,17 @@ Window {
                                     }
                                     spacing: Kirigami.Units.smallSpacing
 
-                                    // Highlight matching part of task name
+                                    // Highlight matched text when searching
                                     QQC2.Label {
                                         text: taskDelegate.modelData.task || i18n("(no task)")
                                         font.bold: true
                                         Layout.fillWidth: true
                                         elide: Text.ElideRight
+                                        color: historyWindow.searchQuery !== ""
+                                            && (taskDelegate.modelData.task || "").toLowerCase()
+                                                .indexOf(historyWindow.searchQuery.toLowerCase()) !== -1
+                                            ? Kirigami.Theme.highlightColor
+                                            : Kirigami.Theme.textColor
                                     }
                                     QQC2.Label {
                                         text: Stats.formatDuration(taskDelegate.modelData.totalSeconds)
@@ -383,15 +386,14 @@ Window {
                             Repeater {
                                 id: sessionRepeater
                                 model: {
-                                    // Use filtered record map so deleted/searched records stay consistent
-                                    var dayRec = historyWindow.filteredDayRecordsMap[taskDelegate.capturedDateKey] || [];
+                                    var dayRec   = historyWindow.dayRecordsMap[taskDelegate.capturedDateKey] || [];
                                     var taskName = taskDelegate.modelData.task;
+                                    // getTaskTotals normalises "(no task)" — match on raw field
+                                    var rawName  = taskName === i18n("(no task)") ? "" : taskName;
                                     var out = [];
                                     for (var i = 0; i < dayRec.length; i++) {
                                         var r = dayRec[i];
-                                        if ((r.task || "") === (taskName || "")) {
-                                            out.push(r);
-                                        }
+                                        if ((r.task || "") === rawName) out.push(r);
                                     }
                                     return out;
                                 }
@@ -401,7 +403,14 @@ Window {
                                     required property var modelData  // individual record
                                     width: dayListView.width
                                     implicitHeight: sessionRow.implicitHeight + Kirigami.Units.smallSpacing
-                                    color: "transparent"
+                                    color: sessionHover.containsMouse
+                                        ? Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                                  Kirigami.Theme.highlightColor.g,
+                                                  Kirigami.Theme.highlightColor.b, 0.05)
+                                        : "transparent"
+
+                                    Behavior on color { ColorAnimation { duration: 80 } }
+                                    HoverHandler { id: sessionHover }
 
                                     RowLayout {
                                         id: sessionRow
@@ -430,7 +439,8 @@ Window {
                                             icon.name: "edit-delete"
                                             display: PlasmaComponents3.AbstractButton.IconOnly
                                             text: i18n("Delete this session")
-                                            opacity: 0.65
+                                            opacity: sessionHover.containsMouse ? 0.9 : 0.0
+                                            Behavior on opacity { NumberAnimation { duration: 120 } }
                                             implicitWidth:  Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
                                             implicitHeight: implicitWidth
                                             onClicked: historyWindow.deleteRecord(sessionDelegate.modelData.id)
