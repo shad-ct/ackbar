@@ -5,6 +5,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 import org.kde.notification
+import "../js/history.js" as History
 
 PlasmoidItem {
     id: root
@@ -30,8 +31,19 @@ PlasmoidItem {
             icon.name: "view-refresh"
             visible: root.pomodoroActive
             onTriggered: root.startWork(Math.max(1, root.pomodoroCount))
+        },
+        PlasmaCore.Action {
+            text: i18n("History…")
+            icon.name: "view-history"
+            visible: plasmoid.configuration.enableHistory
+            onTriggered: {
+                historyLoader.active = true;
+                historyLoader.item.open();
+            }
         }
     ]
+
+    // ── Existing properties (preserved verbatim) ───────────────────────────
 
     readonly property string taskText: plasmoid.configuration.taskText
     readonly property bool hasTask: taskText.length > 0
@@ -55,12 +67,6 @@ PlasmoidItem {
     property string pomodoroText: ""
     signal pomodoroPhaseExpired(string endedPhase)
 
-    function startWork(count) {
-        plasmoid.configuration.pomodoroCount = count;
-        plasmoid.configuration.pomodoroPhase = "work";
-        plasmoid.configuration.phaseEndsAt = String(Date.now() + workDurationMs);
-    }
-
     // Compressed durations for manual testing: 20s work / 15s rest / 10s snooze.
     readonly property bool testMode: false
     readonly property int workDurationMs: testMode
@@ -70,14 +76,39 @@ PlasmoidItem {
     readonly property int snoozeDurationMs: testMode
         ? 10 * 1000 : 60000
 
+    // ── AckBar+ history state ─────────────────────────────────────────────
+
+    // In-memory records array, kept in sync with plasmoid.configuration.historyJson.
+    // This is the single source of truth for the UI; mutations always go through
+    // the helper functions which update both this and historyJson atomically.
+    property var historyRecords: []
+
+    // Load history from KConfig on startup
+    function loadHistory() {
+        historyRecords = History.parseHistoryJson(plasmoid.configuration.historyJson);
+    }
+
+    // ── Pomodoro state management (existing, preserved) ────────────────────
+
+    function startWork(count) {
+        plasmoid.configuration.pomodoroCount = count;
+        plasmoid.configuration.pomodoroPhase = "work";
+        var now = Date.now();
+        plasmoid.configuration.phaseStartedAt = String(now);
+        plasmoid.configuration.phaseEndsAt = String(now + workDurationMs);
+    }
+
     function startRest(ms) {
         plasmoid.configuration.pomodoroPhase = "rest";
-        plasmoid.configuration.phaseEndsAt = String(Date.now() + ms);
+        var now = Date.now();
+        plasmoid.configuration.phaseStartedAt = String(now);
+        plasmoid.configuration.phaseEndsAt = String(now + ms);
     }
 
     function clearPomodoro() {
         plasmoid.configuration.pomodoroPhase = "";
         plasmoid.configuration.phaseEndsAt = "";
+        plasmoid.configuration.phaseStartedAt = "";
         plasmoid.configuration.pomodoroCount = 0;
     }
 
@@ -117,6 +148,101 @@ PlasmoidItem {
             ? `🍅x${pomodoroCount} ${time}`
             : `☕ ${time}`;
     }
+
+    // ── History recording ─────────────────────────────────────────────────
+
+    // Record a completed work Pomodoro to the persistent history.
+    // Guards against duplicates via lastRecordedPomodoroId and in-memory dedup.
+    function recordCompletedPomodoro() {
+        if (!plasmoid.configuration.enableHistory) return;
+        if (!plasmoid.configuration.trackPomodoros) return;
+
+        var phaseStartMs = plasmoid.configuration.phaseStartedAt;
+        if (!phaseStartMs) return;
+
+        var id = History.makeRecordId(phaseStartMs, pomodoroCount);
+
+        // Fast dedup: check persisted last-recorded id first
+        if (plasmoid.configuration.lastRecordedPomodoroId === id) {
+            console.log("AckBar+: Pomodoro", id, "already recorded (config guard) — skipping");
+            return;
+        }
+
+        var phaseEnd   = Number(plasmoid.configuration.phaseEndsAt);
+        var durationSecs = Math.round(plasmoid.configuration.pomodoroMinutes * 60);
+
+        var record = {
+            id:                 id,
+            task:               plasmoid.configuration.trackTasks ? root.taskText : "",
+            startedAt:          Number(phaseStartMs),
+            endedAt:            phaseEnd,
+            durationSeconds:    durationSecs,
+            pomodorosCompleted: 1,
+            type:               "pomodoro"
+        };
+
+        // Add to records (also checks id in the array for safety)
+        var result = History.addRecord(historyRecords, record);
+        if (!result.isDuplicate) {
+            historyRecords = result.records;
+            plasmoid.configuration.historyJson = result.jsonString;
+            plasmoid.configuration.lastRecordedPomodoroId = id;
+        }
+    }
+
+    // ── History mutations (called from HistoryView) ────────────────────────
+
+    function doDeleteRecord(id) {
+        var result = History.deleteRecord(historyRecords, id);
+        historyRecords = result.records;
+        plasmoid.configuration.historyJson = result.jsonString;
+    }
+
+    function doClearHistory() {
+        var result = History.clearHistory();
+        historyRecords = result.records;
+        plasmoid.configuration.historyJson = result.jsonString;
+        plasmoid.configuration.lastRecordedPomodoroId = "";
+    }
+
+    // ── Notification sound ────────────────────────────────────────────────
+
+    // Prevent sounds from firing on widget construction/restart.
+    // soundReady becomes true 2s after the widget loads.
+    property bool soundReady: false
+
+    Timer {
+        id: soundReadyTimer
+        interval: 2000
+        repeat: false
+        running: true
+        onTriggered: root.soundReady = true
+    }
+
+    // Play a sound using paplay (available on PulseAudio/PipeWire systems).
+    // We use Qt.openUrlExternally on a "run:" scheme is not available.
+    // Instead we create a short-lived process via a QML WorkerScript or
+    // leverage the system notification sound that the Notification component
+    // already triggers. Since Notification.Persistent notifications produce
+    // the system event sound via KNotification's sound framework, we send
+    // a transient sound-only notification for the explicit sound request.
+    Notification {
+        id: soundOnlyNotification
+        componentName: "plasma_workspace"
+        eventId: "notification"
+        title: ""
+        text: ""
+        flags: Notification.CloseOnTimeout
+        urgency: Notification.LowUrgency
+    }
+
+    function playCompletionSound() {
+        if (!root.soundReady) return;
+        if (!plasmoid.configuration.enableNotificationSound) return;
+        soundOnlyNotification.sendEvent();
+    }
+
+    // ── Notifications (existing, preserved) ───────────────────────────────
 
     Notification {
         id: workEndNotification
@@ -166,8 +292,16 @@ PlasmoidItem {
 
     onPomodoroPhaseExpired: endedPhase => {
         flashRequested();
-        if (endedPhase === "work") workEndNotification.sendEvent();
-        else restEndNotification.sendEvent();
+        if (endedPhase === "work") {
+            workEndNotification.sendEvent();
+            // AckBar+: record history and optionally play sound
+            recordCompletedPomodoro();
+            if (plasmoid.configuration.soundOnPomodoroComplete) playCompletionSound();
+        } else {
+            restEndNotification.sendEvent();
+            // AckBar+: break completion sound
+            if (plasmoid.configuration.soundOnBreakComplete) playCompletionSound();
+        }
     }
 
     // QML fires *Changed handlers while initial bindings evaluate, in
@@ -205,9 +339,15 @@ PlasmoidItem {
     }
 
     Component.onCompleted: {
+        // Load history from KConfig on widget start
+        loadHistory();
+
         // Normalize stale state from before a plasmashell restart without
         // firing notifications: an expired running phase becomes its Ended
         // twin; the tick then shows overtime from the nominal end.
+        // IMPORTANT: we do NOT call recordCompletedPomodoro() here —
+        // this is state reconstruction, not a new completion.
+        // The dedup guard (lastRecordedPomodoroId) prevents double-recording.
         const endsAt = Number(plasmoid.configuration.phaseEndsAt);
         if (endsAt && Date.now() >= endsAt) {
             if (pomodoroPhase === "work")
@@ -223,6 +363,23 @@ PlasmoidItem {
             clearPomodoro();
         pomodoroInitialized = true;
     }
+
+    // ── History dialog (lazy-loaded) ───────────────────────────────────────
+
+    Loader {
+        id: historyLoader
+        active: false
+        sourceComponent: HistoryView {
+            historyRecords: root.historyRecords
+            showDailyStats: plasmoid.configuration.showDailyStats
+
+            onDeleteRecord: function(id) { root.doDeleteRecord(id); }
+            onClearHistory: function()   { root.doClearHistory();   }
+            onClosed:       function()   { historyLoader.active = false; }
+        }
+    }
+
+    // ── Elapsed timer (existing, preserved) ───────────────────────────────
 
     function updateElapsed() {
         const startedAt = Number(plasmoid.configuration.taskStartedAt);
@@ -251,6 +408,8 @@ PlasmoidItem {
         }
     }
 
+    // ── Blink reminder (existing, preserved) ──────────────────────────────
+
     readonly property color flashColor: plasmoid.configuration.blinkColor
     readonly property int flashIntervalMs: plasmoid.configuration.blinkEnabled
         ? plasmoid.configuration.blinkIntervalMinutes * 60 * 1000
@@ -272,6 +431,8 @@ PlasmoidItem {
             root.flashRequested();
         }
     }
+
+    // ── Layout (existing, preserved verbatim) ─────────────────────────────
 
     preferredRepresentation: compactRepresentation
 
