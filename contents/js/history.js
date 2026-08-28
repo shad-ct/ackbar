@@ -69,6 +69,38 @@ function deleteRecord(existingRecords, id) {
     return { records: filtered, jsonString: serializeRecords(filtered) };
 }
 
+// Delete all records for a given day (dateKey = "YYYY-MM-DD").
+// Returns { records, jsonString }.
+function deleteRecordsByDay(existingRecords, dateKey) {
+    var filtered = [];
+    for (var i = 0; i < existingRecords.length; i++) {
+        var r = existingRecords[i];
+        var d = new Date(r.startedAt);
+        var rKey = d.getFullYear() + "-"
+                 + String(d.getMonth() + 1).padStart(2, "0") + "-"
+                 + String(d.getDate()).padStart(2, "0");
+        if (rKey !== dateKey) filtered.push(r);
+    }
+    return { records: filtered, jsonString: serializeRecords(filtered) };
+}
+
+// Delete all records for a specific task name on a specific day.
+// taskName is the raw task string ("") for un-named sessions.
+// Returns { records, jsonString }.
+function deleteRecordsByTask(existingRecords, dateKey, taskName) {
+    var filtered = [];
+    for (var i = 0; i < existingRecords.length; i++) {
+        var r = existingRecords[i];
+        var d = new Date(r.startedAt);
+        var rKey = d.getFullYear() + "-"
+                 + String(d.getMonth() + 1).padStart(2, "0") + "-"
+                 + String(d.getDate()).padStart(2, "0");
+        if (rKey === dateKey && (r.task || "") === taskName) continue;
+        filtered.push(r);
+    }
+    return { records: filtered, jsonString: serializeRecords(filtered) };
+}
+
 // Clear all records.
 // Returns { records: [], jsonString }.
 function clearHistory() {

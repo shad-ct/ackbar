@@ -5,6 +5,10 @@
             {
                 "Name": "Rodrigo Vieira",
                 "Website": "https://github.com/rodbv"
+            },
+            {
+                "Name": "Shad C T",
+                "Website": "https://github.com/shad-ct"
             }
         ],
         "BugReportUrl": "https://github.com/rodbv/ackbar/issues",

@@ -33,6 +33,8 @@ Window {
     property bool showDailyStats: true
 
     signal deleteRecord(string id)
+    signal deleteRecordsByDay(string dateKey)
+    signal deleteRecordsByTask(string dateKey, string taskName)
     signal clearHistory()
     signal closed()
 
@@ -299,15 +301,20 @@ Window {
                     // ── Day header ────────────────────────────────────────────
 
                     PlasmaExtras.ListSectionHeader {
+                        id: dayHeader
                         Layout.fillWidth: true
                         label: Stats.formatDayLabel(dayDelegate.modelData)
 
+                        // Hover tracking on the header bar
+                        HoverHandler { id: dayHeaderHover }
+
                         // Daily stats on the right
                         QQC2.Label {
-                            visible: historyWindow.showDailyStats
-                            anchors.right: parent.right
+                            id: dayStatsLabel
+                            visible: historyWindow.showDailyStats && !dayDeleteConfirm.visible
+                            anchors.right: dayDeleteBtn.left
+                            anchors.rightMargin: Kirigami.Units.smallSpacing
                             anchors.verticalCenter: parent.verticalCenter
-                            anchors.rightMargin: Kirigami.Units.largeSpacing
                             font: Kirigami.Theme.smallFont
                             opacity: 0.8
                             text: {
@@ -315,6 +322,60 @@ Window {
                                 return "🎯 " + Stats.formatDuration(Stats.getTotalFocusedSeconds(rec))
                                      + "  🍅 " + Stats.getTotalPomodoroCount(rec);
                             }
+                        }
+
+                        // Inline confirm label for day deletion
+                        QQC2.Label {
+                            id: dayDeleteConfirm
+                            visible: false
+                            anchors.right: dayDeleteBtn.left
+                            anchors.rightMargin: Kirigami.Units.smallSpacing
+                            anchors.verticalCenter: parent.verticalCenter
+                            font: Kirigami.Theme.smallFont
+                            color: Kirigami.Theme.negativeTextColor
+                            text: i18n("Delete entire day? Click again to confirm")
+                        }
+
+                        // Delete-day button (hover-revealed)
+                        PlasmaComponents3.ToolButton {
+                            id: dayDeleteBtn
+                            anchors.right: parent.right
+                            anchors.rightMargin: Kirigami.Units.largeSpacing
+                            anchors.verticalCenter: parent.verticalCenter
+                            icon.name: dayDeleteConfirm.visible ? "edit-delete" : "edit-delete-remove"
+                            display: PlasmaComponents3.AbstractButton.IconOnly
+                            text: i18n("Delete this day")
+                            opacity: (dayHeaderHover.containsMouse || dayDeleteConfirm.visible) ? 0.9 : 0.0
+                            Behavior on opacity { NumberAnimation { duration: 120 } }
+                            implicitWidth:  Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
+                            implicitHeight: implicitWidth
+
+                            // Two-click confirm pattern
+                            property bool confirming: false
+                            Timer {
+                                id: dayConfirmReset
+                                interval: 3000
+                                repeat: false
+                                onTriggered: {
+                                    dayDeleteBtn.confirming = false;
+                                    dayDeleteConfirm.visible = false;
+                                }
+                            }
+                            onClicked: {
+                                if (!confirming) {
+                                    confirming = true;
+                                    dayDeleteConfirm.visible = true;
+                                    dayConfirmReset.restart();
+                                } else {
+                                    confirming = false;
+                                    dayDeleteConfirm.visible = false;
+                                    historyWindow.deleteRecordsByDay(dayDelegate.modelData);
+                                }
+                            }
+
+                            QQC2.ToolTip.text: i18n("Delete all sessions on this day")
+                            QQC2.ToolTip.visible: hovered
+                            QQC2.ToolTip.delay: 500
                         }
                     }
 
@@ -333,6 +394,7 @@ Window {
 
                             // Task summary row
                             Rectangle {
+                                id: taskSummaryRect
                                 Layout.fillWidth: true
                                 implicitHeight: taskRow.implicitHeight + Kirigami.Units.smallSpacing * 2
                                 color: taskHover.containsMouse
@@ -378,6 +440,57 @@ Window {
                                         text: "🍅×" + taskDelegate.modelData.pomodoroCount
                                         opacity: 0.7
                                         font: Kirigami.Theme.smallFont
+                                    }
+
+                                    // Inline confirm label for task deletion
+                                    QQC2.Label {
+                                        id: taskDeleteConfirm
+                                        visible: false
+                                        font: Kirigami.Theme.smallFont
+                                        color: Kirigami.Theme.negativeTextColor
+                                        text: i18n("Click again to confirm")
+                                    }
+
+                                    // Delete-task button (hover-revealed)
+                                    PlasmaComponents3.ToolButton {
+                                        id: taskDeleteBtn
+                                        icon.name: "edit-delete"
+                                        display: PlasmaComponents3.AbstractButton.IconOnly
+                                        text: i18n("Delete this task's sessions")
+                                        opacity: (taskHover.containsMouse || taskDeleteConfirm.visible) ? 0.9 : 0.0
+                                        Behavior on opacity { NumberAnimation { duration: 120 } }
+                                        implicitWidth:  Kirigami.Units.iconSizes.small + Kirigami.Units.smallSpacing * 2
+                                        implicitHeight: implicitWidth
+
+                                        property bool confirming: false
+                                        Timer {
+                                            id: taskConfirmReset
+                                            interval: 3000
+                                            repeat: false
+                                            onTriggered: {
+                                                taskDeleteBtn.confirming = false;
+                                                taskDeleteConfirm.visible = false;
+                                            }
+                                        }
+                                        onClicked: {
+                                            if (!confirming) {
+                                                confirming = true;
+                                                taskDeleteConfirm.visible = true;
+                                                taskConfirmReset.restart();
+                                            } else {
+                                                confirming = false;
+                                                taskDeleteConfirm.visible = false;
+                                                // raw task name (empty string for "(no task)")
+                                                var rawName = taskDelegate.modelData.task === i18n("(no task)")
+                                                    ? "" : taskDelegate.modelData.task;
+                                                historyWindow.deleteRecordsByTask(
+                                                    taskDelegate.capturedDateKey, rawName);
+                                            }
+                                        }
+
+                                        QQC2.ToolTip.text: i18n("Delete all sessions for this task today")
+                                        QQC2.ToolTip.visible: hovered
+                                        QQC2.ToolTip.delay: 500
                                     }
                                 }
                             }

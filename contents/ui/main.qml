@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents3
+import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.kirigami as Kirigami
 import org.kde.notification
 import "../js/history.js" as History
@@ -236,6 +237,18 @@ PlasmoidItem {
         plasmoid.configuration.historyJson = result.jsonString;
     }
 
+    function doDeleteRecordsByDay(dateKey) {
+        var result = History.deleteRecordsByDay(historyRecords, dateKey);
+        historyRecords = result.records;
+        plasmoid.configuration.historyJson = result.jsonString;
+    }
+
+    function doDeleteRecordsByTask(dateKey, taskName) {
+        var result = History.deleteRecordsByTask(historyRecords, dateKey, taskName);
+        historyRecords = result.records;
+        plasmoid.configuration.historyJson = result.jsonString;
+    }
+
     function doClearHistory() {
         var result = History.clearHistory();
         historyRecords = result.records;
@@ -243,10 +256,10 @@ PlasmoidItem {
         plasmoid.configuration.lastRecordedPomodoroId = "";
     }
 
-    // ── Notification sound ────────────────────────────────────────────────
+    // ── Notification sound ─────────────────────────────────────────────────
 
     // Prevent sounds from firing on widget construction/restart.
-    // soundReady becomes true 2s after the widget loads.
+    // soundReady becomes true 2 s after the widget loads.
     property bool soundReady: false
 
     Timer {
@@ -257,36 +270,41 @@ PlasmoidItem {
         onTriggered: root.soundReady = true
     }
 
-    // Play an alarm-style sound using KNotification's "alarm" event.
-    // The "alarm" eventId maps to a dedicated sound in most KDE sound themes
-    // (oxygen, breeze-sounds) and is distinct from a plain "notification" ping.
-    // We send it at CriticalUrgency so the daemon does not suppress it.
-    Notification {
-        id: alarmNotification
-        componentName: "plasma_workspace"
-        eventId: "alarm"
-        title: ""
-        text: ""
-        flags: Notification.CloseOnTimeout
-        urgency: Notification.CriticalUrgency
+    // Plasma5Support DataSource — "executable" engine lets us fire shell
+    // commands from QML without C++.  We use paplay (always available on
+    // PipeWire/PulseAudio systems) to play real audio files.  The source is
+    // disconnected after each data update to allow re-triggering.
+    Plasma5Support.DataSource {
+        id: soundRunner
+        engine: "executable"
+        connectedSources: []
+        onNewData: function(sourceName, data) {
+            disconnectSource(sourceName);
+        }
+        function play(soundFile) {
+            // paplay is PulseAudio/PipeWire native; canberra-gtk-play is a
+            // fallback. We prefer paplay with a concrete path so there is
+            // zero ambiguity about what is played.
+            connectSource("paplay --volume=65536 \"" + soundFile + "\"");
+        }
     }
 
-    // Fallback: send a plain notification event if "alarm" is unavailable.
-    Notification {
-        id: soundOnlyNotification
-        componentName: "plasma_workspace"
-        eventId: "notification"
-        title: ""
-        text: ""
-        flags: Notification.CloseOnTimeout
-        urgency: Notification.NormalUrgency
-    }
+    // Sound file paths (Freedesktop + Ocean theme — ship with every major distro).
+    // completion-success  → pomodoro done
+    // alarm-clock-elapsed → break over / rest ended
+    readonly property string sfPomodoroDone:  "/usr/share/sounds/ocean/stereo/completion-success.oga"
+    readonly property string sfBreakDone:     "/usr/share/sounds/ocean/stereo/alarm-clock-elapsed.oga"
+    readonly property string sfFallbackPomo:  "/usr/share/sounds/freedesktop/stereo/complete.oga"
+    readonly property string sfFallbackBreak: "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga"
 
-    function playCompletionSound() {
+    function playCompletionSound(isBreak) {
         if (!root.soundReady) return;
         if (!plasmoid.configuration.enableNotificationSound) return;
-        // Use the alarm event which triggers the KDE alarm/ringtone sound
-        alarmNotification.sendEvent();
+        var primary  = isBreak ? sfBreakDone     : sfPomodoroDone;
+        var fallback = isBreak ? sfFallbackBreak  : sfFallbackPomo;
+        // Try primary path; the shell will silently exit non-zero if the
+        // file does not exist, then we fall through to the fallback.
+        soundRunner.play(primary + "\" || paplay --volume=65536 \"" + fallback);
     }
 
     // ── Notifications (existing, preserved) ───────────────────────────────
@@ -337,17 +355,22 @@ PlasmoidItem {
         ]
     }
 
+    // Celebration animation signal — the bar will shimmer gold on completion.
+    signal celebrationRequested()
+
     onPomodoroPhaseExpired: endedPhase => {
         flashRequested();
         if (endedPhase === "work") {
             workEndNotification.sendEvent();
-            // AckBar+: record history and optionally play sound
+            // AckBar+: record history, play sound, celebrate
             recordCompletedPomodoro();
-            if (plasmoid.configuration.soundOnPomodoroComplete) playCompletionSound();
+            if (plasmoid.configuration.soundOnPomodoroComplete) playCompletionSound(false);
+            celebrationRequested();
         } else {
             restEndNotification.sendEvent();
-            // AckBar+: break completion sound
-            if (plasmoid.configuration.soundOnBreakComplete) playCompletionSound();
+            // AckBar+: break completion sound + celebrate
+            if (plasmoid.configuration.soundOnBreakComplete) playCompletionSound(true);
+            celebrationRequested();
         }
     }
 
@@ -422,9 +445,11 @@ PlasmoidItem {
             historyRecords: root.historyRecords
             showDailyStats: plasmoid.configuration.showDailyStats
 
-            onDeleteRecord: function(id) { root.doDeleteRecord(id); }
-            onClearHistory: function()   { root.doClearHistory();   }
-            onClosed:       function()   { historyLoader.active = false; }
+            onDeleteRecord:         function(id)              { root.doDeleteRecord(id); }
+            onDeleteRecordsByDay:   function(dateKey)         { root.doDeleteRecordsByDay(dateKey); }
+            onDeleteRecordsByTask:  function(dateKey, taskName) { root.doDeleteRecordsByTask(dateKey, taskName); }
+            onClearHistory:         function()                { root.doClearHistory(); }
+            onClosed:               function()                { historyLoader.active = false; }
 
             Component.onCompleted: open()
         }
@@ -582,6 +607,68 @@ PlasmoidItem {
                     duration: 80
                 }
                 PauseAnimation { duration: 160 }
+            }
+        }
+
+        // ── Celebration overlay — gold shimmer on Pomodoro/rest completion ───
+        Rectangle {
+            id: celebOverlay
+            anchors.fill: bar
+            radius: bar.radius
+            opacity: 0
+            // Animated gold → lime gradient approximated via a color sweep
+            color: celebColor.value
+
+            property color celebColorValue: "#FFD700"
+            Behavior on celebColorValue { ColorAnimation { duration: 180 } }
+
+            // Expose a cycling color for the shimmer
+            QtObject {
+                id: celebColor
+                property color value: "#FFD700"
+            }
+
+            Connections {
+                target: root
+                function onCelebrationRequested() {
+                    celebAnimation.restart();
+                }
+            }
+
+            SequentialAnimation {
+                id: celebAnimation
+                // Phase 1 — slam to gold
+                ParallelAnimation {
+                    NumberAnimation {
+                        target: celebOverlay; property: "opacity"
+                        from: 0; to: 0.85; duration: 120; easing.type: Easing.OutQuad
+                    }
+                    ColorAnimation {
+                        target: celebColor; property: "value"
+                        from: "#FFD700"; to: "#FFD700"; duration: 120
+                    }
+                }
+                // Phase 2 — sweep lime
+                ColorAnimation {
+                    target: celebColor; property: "value"
+                    to: "#39FF14"; duration: 200
+                }
+                // Phase 3 — sweep cyan
+                ColorAnimation {
+                    target: celebColor; property: "value"
+                    to: "#00FFFF"; duration: 200
+                }
+                // Phase 4 — sweep gold again
+                ColorAnimation {
+                    target: celebColor; property: "value"
+                    to: "#FFD700"; duration: 200
+                }
+                PauseAnimation { duration: 120 }
+                // Phase 5 — fade out
+                NumberAnimation {
+                    target: celebOverlay; property: "opacity"
+                    to: 0; duration: 600; easing.type: Easing.InCubic
+                }
             }
         }
 
