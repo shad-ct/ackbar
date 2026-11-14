@@ -81,3 +81,4 @@ Rectangle {
         onClicked: root.clicked()
     }
 }
+

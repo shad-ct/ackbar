@@ -5,9 +5,12 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasma5support as Plasma5Support
 
 PlasmoidItem {
-    id: root
+    id: plasmoidRoot
 
-    preferredRepresentation: fullRepresentation
+    Plasmoid.icon: "office-chart-line"
+    Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground
+
+    preferredRepresentation: Plasmoid.formFactor === PlasmaCore.Types.Planar ? fullRepresentation : null
 
     property string activeFormatted: "0m"
     property string onlineFormatted: "0m"
@@ -20,15 +23,18 @@ PlasmoidItem {
     property var sparklineData: []
     property bool isTrackerRunning: true
 
-    property string queryCmd: "python3 " + Qt.resolvedUrl("../../backend/widget_data.py").toString().replace("file://", "")
+    property string queryCmd: "python3 " + Qt.resolvedUrl("../scripts/widget_data.py").toString().replace("file://", "")
+    property string launchCmd: "bash " + Qt.resolvedUrl("../scripts/launch_dashboard.sh").toString().replace("file://", "")
 
     function refreshData() {
-        execSource.connectSource(root.queryCmd);
+        var cmd = plasmoidRoot.queryCmd;
+        execSource.disconnectSource(cmd);
+        execSource.connectSource(cmd);
     }
 
     function openDashboard() {
-        var dashPath = Qt.resolvedUrl("../../timetrack-dashboard").toString().replace("file://", "");
-        execSource.connectSource("setsid " + dashPath + " >/dev/null 2>&1 &");
+        var cmd = plasmoidRoot.launchCmd + " " + Date.now();
+        execSource.connectSource(cmd);
     }
 
     Plasma5Support.DataSource {
@@ -38,19 +44,19 @@ PlasmoidItem {
 
         onNewData: function(sourceName, data) {
             disconnectSource(sourceName);
-            if (sourceName === root.queryCmd && data.stdout) {
+            if (sourceName === plasmoidRoot.queryCmd && data.stdout) {
                 try {
                     var parsed = JSON.parse(data.stdout.trim());
-                    root.activeFormatted = parsed.active_formatted || "0m";
-                    root.onlineFormatted = parsed.online_formatted || "0m";
-                    root.activeSeconds = parsed.active_seconds || 0;
-                    root.onlineSeconds = parsed.online_seconds || 0;
-                    root.currentApp = parsed.current_app || "Idle";
-                    root.currentDurationFormatted = parsed.current_duration_formatted || "0s";
-                    root.topApp = parsed.top_app || "None";
-                    root.topAppDuration = parsed.top_app_duration || "0s";
-                    root.sparklineData = parsed.sparkline || [];
-                    root.isTrackerRunning = (parsed.current_app !== "Tracker Offline");
+                    plasmoidRoot.activeFormatted = parsed.active_formatted || "0m";
+                    plasmoidRoot.onlineFormatted = parsed.online_formatted || "0m";
+                    plasmoidRoot.activeSeconds = parsed.active_seconds || 0;
+                    plasmoidRoot.onlineSeconds = parsed.online_seconds || 0;
+                    plasmoidRoot.currentApp = parsed.current_app || "Idle";
+                    plasmoidRoot.currentDurationFormatted = parsed.current_duration_formatted || "0s";
+                    plasmoidRoot.topApp = parsed.top_app || "None";
+                    plasmoidRoot.topAppDuration = parsed.top_app_duration || "0s";
+                    plasmoidRoot.sparklineData = parsed.sparkline || [];
+                    plasmoidRoot.isTrackerRunning = (parsed.is_running !== false);
                 } catch (e) {
                     console.warn("[TimeTrackWidget] Parse error:", e);
                 }
@@ -64,16 +70,14 @@ PlasmoidItem {
         repeat: true
         running: true
         triggeredOnStart: true
-        onTriggered: root.refreshData()
+        onTriggered: plasmoidRoot.refreshData()
     }
 
     compactRepresentation: CompactRepresentation {
-        id: compactRep
-        plasmoidItem: root
+        plasmoidItem: plasmoidRoot
     }
 
     fullRepresentation: FullRepresentation {
-        id: fullRep
-        plasmoidItem: root
+        plasmoidItem: plasmoidRoot
     }
 }

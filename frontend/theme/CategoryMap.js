@@ -31,3 +31,4 @@ function getCategoryIcon(key) {
 function getCategoryName(key) {
     return getCategoryInfo(key).name;
 }
+

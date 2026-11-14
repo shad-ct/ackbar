@@ -144,3 +144,4 @@ class TimeTrackBridge(QObject):
         except Exception as e:
             self.exportCompleted.emit(False, str(e))
             return f"Export error: {e}"
+

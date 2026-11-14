@@ -206,3 +206,4 @@ Flickable {
         root.reloadYear();
     }
 }
+

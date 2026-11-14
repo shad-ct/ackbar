@@ -1,21 +1,22 @@
 {
+    "KPackageStructure": "Plasma/Applet",
     "KPlugin": {
         "Authors": [
             {
-                "Email": "developer@kde.org",
                 "Name": "KDE Visual Analytics Team"
             }
         ],
         "Category": "Utilities",
-        "Description": "Compact time-tracking overview and launcher for TimeTrack Visual Analytics.",
+        "Description": "Compact time-tracking overview and launcher for TimeTrack Visual Analytics",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
         "Icon": "office-chart-line",
         "Id": "org.kde.plasma.timetrackanalytics",
+        "License": "MIT",
         "Name": "TimeTrack Analytics",
-        "ServiceTypes": [
-            "Plasma/Applet"
-        ],
-        "Version": "1.0.0",
-        "Website": "https://kde.org"
+        "Version": "1.0.0"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
     "X-Plasma-MainScript": "ui/main.qml"

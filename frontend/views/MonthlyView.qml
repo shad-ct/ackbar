@@ -162,3 +162,4 @@ Flickable {
         root.reloadMonth();
     }
 }
+

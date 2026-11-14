@@ -257,3 +257,4 @@ Item {
         root.reloadApps();
     }
 }
+

@@ -128,3 +128,4 @@ Flickable {
         root.reloadWeek();
     }
 }
+

@@ -304,8 +304,11 @@ Item {
             onClicked: {
                 if (root.plasmoidItem) {
                     root.plasmoidItem.openDashboard();
+                } else if (typeof plasmoidRoot !== "undefined") {
+                    plasmoidRoot.openDashboard();
                 }
             }
         }
     }
 }
+

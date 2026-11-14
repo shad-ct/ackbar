@@ -34,3 +34,4 @@ QtObject {
     readonly property int spacingMedium: 14
     readonly property int spacingLarge: 20
 }
+

@@ -349,3 +349,4 @@ QQC2.ApplicationWindow {
         window.reloadAll();
     }
 }
+

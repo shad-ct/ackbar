@@ -6,7 +6,7 @@ import org.kde.plasma.plasmoid
 Item {
     id: compactRoot
 
-    property var plasmoidItem: null
+    property var plasmoidItem: typeof plasmoidRoot !== "undefined" ? plasmoidRoot : null
 
     property bool inPanel: plasmoidItem
                            ? (plasmoidItem.location === Plasmoid.TopEdge ||
@@ -22,7 +22,7 @@ Item {
 
     Layout.minimumWidth: isVertical ? 24 : 85
     Layout.minimumHeight: 24
-    Layout.preferredWidth: isVertical ? Kirigami.Units.gridUnit * 2 : Layout.minimumWidth
+    Layout.preferredWidth: isVertical ? Kirigami.Units.gridUnit * 2 : 85
     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
     RowLayout {
@@ -55,15 +55,19 @@ Item {
         cursorShape: Qt.PointingHandCursor
 
         property bool wasExpanded: false
+
         onPressed: {
-            var item = compactRoot.plasmoidItem || (typeof plasmoidRoot !== "undefined" ? plasmoidRoot : null);
-            wasExpanded = item ? item.expanded : false;
+            var item = compactRoot.plasmoidItem || (typeof plasmoidRoot !== "undefined" ? plasmoidRoot : null) || plasmoid;
+            wasExpanded = item ? item.expanded : (typeof Plasmoid !== "undefined" ? Plasmoid.expanded : false);
         }
 
         onClicked: {
-            var item = compactRoot.plasmoidItem || (typeof plasmoidRoot !== "undefined" ? plasmoidRoot : null);
+            var item = compactRoot.plasmoidItem || (typeof plasmoidRoot !== "undefined" ? plasmoidRoot : null) || plasmoid;
             if (item) {
                 item.expanded = !wasExpanded;
+            }
+            if (typeof Plasmoid !== "undefined") {
+                Plasmoid.expanded = !wasExpanded;
             }
         }
     }

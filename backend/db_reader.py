@@ -62,3 +62,4 @@ class TimeTrackDBReader:
             return res.stdout.strip() == "active"
         except Exception:
             return False
+

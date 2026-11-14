@@ -29,3 +29,4 @@ else
 fi
 
 echo "✓ TimeTrack Analytics widget installed successfully!"
+

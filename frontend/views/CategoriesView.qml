@@ -155,3 +155,4 @@ Flickable {
         root.reloadCategories();
     }
 }
+
