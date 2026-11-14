@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "KDE Productivity Suite Contributors"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Track recurring habits, streaks, and consistency with a non-intrusive activity graph",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
+        "Icon": "user-identity",
+        "Id": "org.kde.plasma.productivitysuite.habittracker",
+        "License": "MIT",
+        "Name": "Habit Tracker",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
+}

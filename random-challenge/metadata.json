@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "KDE Productivity Suite Contributors"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Daily missions and micro-challenges across science, programming, arts, and dexterity",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
+        "Icon": "games-solve",
+        "Id": "org.kde.plasma.productivitysuite.randomchallenge",
+        "License": "MIT",
+        "Name": "Random Challenge",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
+}

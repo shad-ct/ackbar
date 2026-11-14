@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+TimeTrack Visual Analytics Dashboard
+Native KDE Plasma 6 Desktop Application Window (PyQt6 + QML)
+"""
+
+import sys
+import os
+import signal
+from pathlib import Path
+
+# Add project root to sys.path
+PROJECT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(PROJECT_DIR))
+
+from PyQt6.QtCore import QUrl, QCoreApplication
+from PyQt6.QtGui import QGuiApplication, QIcon
+from PyQt6.QtQml import QQmlApplicationEngine
+
+from backend.db_reader import TimeTrackDBReader
+from backend.query_service import TimeTrackQueryService
+from backend.bridge import TimeTrackBridge
+
+
+def main():
+    # Handle Ctrl+C in terminal
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    # Enable high DPI and Wayland attributes
+    os.environ["QT_QUICK_CONTROLS_STYLE"] = "org.kde.breeze"
+
+    app = QGuiApplication(sys.argv)
+    app.setApplicationName("TimeTrack Visual Analytics")
+    app.setOrganizationName("KDE")
+    app.setOrganizationDomain("kde.org")
+
+    # Initialize Backend
+    reader = TimeTrackDBReader()
+    query_service = TimeTrackQueryService(reader)
+    bridge = TimeTrackBridge(query_service)
+
+    # Initialize QML Engine
+    engine = QQmlApplicationEngine()
+    engine.rootContext().setContextProperty("backend", bridge)
+
+    main_qml_path = PROJECT_DIR / "frontend" / "main.qml"
+    engine.load(QUrl.fromLocalFile(str(main_qml_path)))
+
+    if not engine.rootObjects():
+        print(f"Error: Failed to load QML interface from {main_qml_path}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"TimeTrack Visual Analytics Dashboard launched successfully (PID: {os.getpid()})")
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()

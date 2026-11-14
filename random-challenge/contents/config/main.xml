@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+
+    <group name="General">
+        <entry name="completedHistory" type="String">
+            <label>Serialized JSON array of completed challenge logs.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="favoriteChallenges" type="String">
+            <label>Serialized JSON array of favorite challenge IDs.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="customChallenges" type="String">
+            <label>Serialized JSON array of user-created custom challenges.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="deletedChallenges" type="String">
+            <label>Serialized JSON array of deleted challenge IDs.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="currentActiveChallengeId" type="String">
+            <label>ID of currently selected challenge.</label>
+            <default></default>
+        </entry>
+        <entry name="dailyChallengeDate" type="String">
+            <label>Date key for the daily challenge.</label>
+            <default></default>
+        </entry>
+        <entry name="preferredDifficulty" type="String">
+            <label>Preferred difficulty filter.</label>
+            <default>All</default>
+        </entry>
+        <entry name="preferredCategory" type="String">
+            <label>Preferred category filter.</label>
+            <default>All</default>
+        </entry>
+    </group>
+</kcfg>
+

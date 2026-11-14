@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "KDE Productivity Suite Contributors"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Unified productivity manager uniting daily task prioritization with long-term goals and milestones",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
+        "Icon": "view-calendar-tasks",
+        "Id": "org.kde.plasma.productivitysuite.taskgoalmanager",
+        "License": "MIT",
+        "Name": "Task & Goal Manager",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
+}

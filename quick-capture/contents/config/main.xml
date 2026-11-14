@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+
+    <group name="General">
+        <entry name="entriesData" type="String">
+            <label>Serialized JSON list of captured entries.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="draftText" type="String">
+            <label>Unsaved draft text in the input area.</label>
+            <default></default>
+        </entry>
+        <entry name="quickSaveWithEnter" type="Bool">
+            <label>Save entry when pressing Enter (Shift+Enter inserts newline).</label>
+            <default>true</default>
+        </entry>
+        <entry name="maxDisplayCount" type="Int">
+            <label>Maximum number of recent entries to show in the list.</label>
+            <default>30</default>
+        </entry>
+        <entry name="defaultCategory" type="String">
+            <label>Default category for new captures.</label>
+            <default>Idea</default>
+        </entry>
+    </group>
+</kcfg>
+

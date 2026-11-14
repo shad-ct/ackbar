@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+
+    <group name="General">
+        <entry name="hasSeeded" type="Bool">
+            <label>Whether initial seed tasks and goals have been installed.</label>
+            <default>false</default>
+        </entry>
+        <entry name="tasksData" type="String">
+            <label>Serialized JSON array of tasks.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="goalsData" type="String">
+            <label>Serialized JSON array of goals and milestones.</label>
+            <default>[]</default>
+        </entry>
+        <entry name="defaultPriority" type="String">
+            <label>Default priority level for new tasks.</label>
+            <default>Medium</default>
+        </entry>
+        <entry name="sortBy" type="String">
+            <label>Default task sort order (deadline or priority).</label>
+            <default>priority</default>
+        </entry>
+    </group>
+</kcfg>
+

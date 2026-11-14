@@ -1,0 +1,26 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "KDE Productivity Suite Contributors"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Instant brain dump widget for capturing thoughts, tasks, reminders, and notes",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
+        "Icon": "document-edit",
+        "Id": "org.kde.plasma.productivitysuite.quickcapture",
+        "License": "MIT",
+        "Name": "Quick Capture",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-Provides": [
+        "org.kde.plasma.notes"
+    ]
+}
