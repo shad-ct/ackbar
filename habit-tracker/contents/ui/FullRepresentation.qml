@@ -81,6 +81,17 @@ Item {
             }
 
             PlasmaComponents.Button {
+                text: i18n("Restore Defaults")
+                icon.name: "view-refresh"
+                flat: true
+                Layout.preferredHeight: 28
+                onClicked: {
+                    Storage.restoreDefaultHabits(plasmoid);
+                    root.reloadData();
+                }
+            }
+
+            PlasmaComponents.Button {
                 text: i18n("+ Add")
                 icon.name: "list-add"
                 Layout.preferredHeight: 28
