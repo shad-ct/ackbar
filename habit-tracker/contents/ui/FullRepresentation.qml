@@ -130,16 +130,13 @@ Item {
                 iconName: "user-identity"
             }
 
-            Item {
-                anchors.fill: parent
-                visible: root.habitsList.length > 0
-                clip: true
-
-                ListView {
-                    id: habitsListView
-                    width: parent.width
-                    spacing: 6
-                    model: root.habitsList
+            ListView {
+                id: habitsListView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                width: parent.width
+                spacing: 6
+                model: root.habitsList
 
                     delegate: HabitRow {
                         width: habitsListView.width
@@ -165,7 +162,6 @@ Item {
                     }
                 }
             }
-        }
 
         // Tab 2: Activity Graph
         Item {
