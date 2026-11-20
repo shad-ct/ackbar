@@ -7,7 +7,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Ensure shared files are synced
 "${SCRIPT_DIR}/sync-shared.sh"
 
-WIDGETS=("quick-capture" "habit-tracker" "random-challenge" "task-goal-manager" "timetrack-widget")
+WIDGETS=("quick-capture" "habit-tracker" "random-challenge" "task-goal-manager" "timetrack-widget" "journal-widget")
 TARGET_WIDGETS=("${@:-${WIDGETS[@]}}")
 
 echo "=============================================="

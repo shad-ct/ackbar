@@ -14,7 +14,22 @@ var CATEGORIES = [
     "Origami",
     "Language learning",
     "Creative writing",
-    "General knowledge"
+    "General knowledge",
+    "Fitness and strength",
+    "Cardiovascular endurance",
+    "Martial arts and self defense",
+    "Dance and movement",
+    "Yoga and flexibility",
+    "Swimming and aquatics",
+    "Cycling",
+    "Running and track",
+    "Calisthenics",
+    "Outdoor and adventure",
+    "Team sports",
+    "Racket sports",
+    "Balance and coordination",
+    "Breathwork and recovery",
+    "Gymnastics"
 ];
 
 var DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
@@ -942,6 +957,996 @@ var INITIAL_CHALLENGES = [
         category: "General knowledge",
         difficulty: "Advanced",
         duration: 35
+    },
+
+    // 15. Fitness and strength (8)
+    {
+        id: "fit_01",
+        title: "Master the Push-Up (10 Strict Reps)",
+        description: "Perform 10 strict full-range push-ups with chest to floor, elbows at 45 degrees, core braced, and a straight body line from head to heels. Rest 60 seconds between sets; aim for 3 sets.",
+        category: "Fitness and strength",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "fit_02",
+        title: "Bodyweight Squat Volume Challenge (50 Reps)",
+        description: "Complete 50 air squats with hips below knees, knees tracking toes, and heels down. Break into sets as needed but minimize rest. Focus on depth and consistent tempo.",
+        category: "Fitness and strength",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "fit_03",
+        title: "Plank Hold for Time (2 Minutes)",
+        description: "Hold a forearm plank with elbows under shoulders, glutes and quads engaged, spine neutral, for a continuous 2 minutes. Record your time and aim to beat it.",
+        category: "Fitness and strength",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "fit_04",
+        title: "Dumbbell Goblet Squat Form Clinic",
+        description: "Hold a dumbbell or weighted object at chest height. Perform 3 sets of 12 goblet squats, emphasizing an upright torso, elbows inside knees, and driving through the heels.",
+        category: "Fitness and strength",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "fit_05",
+        title: "Romanian Deadlift Hip Hinge Practice",
+        description: "With a light weight or broomstick, practice the hip hinge: soft knees, push hips back while keeping a flat back, feel hamstring stretch, then squeeze glutes to return. 3 sets of 10.",
+        category: "Fitness and strength",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "fit_06",
+        title: "Overhead Press Stability Test",
+        description: "Stand tall and press a light weight overhead from front-rack position to full lockout without arching the lower back. 3 sets of 8 reps, core braced throughout.",
+        category: "Fitness and strength",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "fit_07",
+        title: "Walking Lunge Circuit (20 Meters)",
+        description: "Lunge-walk 20 meters forward with each knee nearly touching the ground, torso upright, then turn and lunge back. Repeat for 3 rounds, tracking total distance.",
+        category: "Fitness and strength",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "fit_08",
+        title: "Farmer's Carry Grip & Core",
+        description: "Pick up two heavy, equal weights (dumbbells, kettlebells, or filled water jugs). Walk 40 meters with shoulders down, core tight, and an upright posture. 3 rounds.",
+        category: "Fitness and strength",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+
+    // 16. Cardiovascular endurance (8)
+    {
+        id: "cardio_01",
+        title: "Brisk 30-Minute Walk",
+        description: "Walk outdoors at a brisk, conversation-pace for 30 continuous minutes. Focus on steady breathing, heel-to-toe rolling, and swinging arms naturally.",
+        category: "Cardiovascular endurance",
+        difficulty: "Beginner",
+        duration: 35
+    },
+    {
+        id: "cardio_02",
+        title: "Jump Rope for 5 Minutes Straight",
+        description: "Jump rope continuously for 5 minutes, landing softly on the balls of your feet. Pause only to untangle; count total jumps and aim to increase next time.",
+        category: "Cardiovascular endurance",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "cardio_03",
+        title: "Stair Climb Intervals (10 Flights)",
+        description: "Climb 10 flights of stairs at a steady pace, walking back down for recovery. Time the ascent and note how your legs and lungs feel by the final flight.",
+        category: "Cardiovascular endurance",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "cardio_04",
+        title: "2-Kilometer Steady Run",
+        description: "Run or jog 2 km without stopping at a conversational pace. Focus on relaxed shoulders, mid-foot strike, and rhythmic breathing (inhale 3 steps, exhale 2).",
+        category: "Cardiovascular endurance",
+        difficulty: "Beginner",
+        duration: 20
+    },
+    {
+        id: "cardio_05",
+        title: "High-Knee Running Drill (3 Minutes)",
+        description: "Run in place driving knees to hip height for 3 minutes total, broken into 30-second bursts with 30 seconds of marching recovery between each.",
+        category: "Cardiovascular endurance",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "cardio_06",
+        title: "Shadow Boxing Cardio Round",
+        description: "Throw continuous punches and move your feet for one 3-minute round, as if in a boxing ring. Stay light on your toes and keep your guard up the whole time.",
+        category: "Cardiovascular endurance",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "cardio_07",
+        title: "Burpee Ladder (1-10-1)",
+        description: "Perform burpees in a ladder: 1 rep, rest; 2 reps, rest; ... up to 10, then back down to 1. Modify by stepping back instead of jumping if needed.",
+        category: "Cardiovascular endurance",
+        difficulty: "Advanced",
+        duration: 20
+    },
+    {
+        id: "cardio_08",
+        title: "Rowing Machine 500-Meter Sprint",
+        description: "On a rowing machine, row 500 meters as fast as you can with proper form (legs, core, arms on the drive; arms, core, legs on the recovery). Record your time.",
+        category: "Cardiovascular endurance",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+
+    // 17. Martial arts and self defense (8)
+    {
+        id: "martial_01",
+        title: "Learn the Basic Fighting Stance & Footwork",
+        description: "Adopt a balanced fighting stance: lead foot forward, weight on balls of feet, hands guarding chin. Practice stepping forward, backward, and side-to-side while returning to stance.",
+        category: "Martial arts and self defense",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "martial_02",
+        title: "Throw 50 Jab-Cross Combinations",
+        description: "Practice the jab-cross (1-2) combination on air or a heavy bag for 50 repetitions. Rotate hips on the cross, snap punches back to guard, and breathe on each strike.",
+        category: "Martial arts and self defense",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "martial_03",
+        title: "Front Kick Technique Drill",
+        description: "Practice the front snap kick: chamber the knee, extend the leg with the ball of the foot, retract quickly, and return to stance. 10 reps per leg.",
+        category: "Martial arts and self defense",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "martial_04",
+        title: "Basic Escapes from Wrist Grabs",
+        description: "With a partner, practice releasing yourself from single and double wrist grabs using rotation against the thumb weak point. 5 repetitions each side.",
+        category: "Martial arts and self defense",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "martial_05",
+        title: "Roundhouse Kick on Heavy Bag",
+        description: "Pivot on the ball of your foot, rotate hips, and strike with the shin. Perform 10 roundhouse kicks per leg on a heavy bag or target, resetting stance between each.",
+        category: "Martial arts and self defense",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "martial_06",
+        title: "Shrimp & Bridge Floor Movement (BJJ)",
+        description: "On a mat, practice the hip escape (shrimp) and bridge movements used in Brazilian Jiu-Jitsu to create space from the bottom position. 1 minute each, continuous.",
+        category: "Martial arts and self defense",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "martial_07",
+        title: "Parry and Counter Drill",
+        description: "With a partner throwing slow punches, practice parrying (deflecting) the strike and immediately countering with a straight punch. 10 cycles per side.",
+        category: "Martial arts and self defense",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "martial_08",
+        title: "Shadow Fight Full Round (3 Minutes)",
+        description: "Combine stance, footwork, punches, kicks, and slips into a continuous 3-minute shadow fight, moving in all directions and keeping a high guard throughout.",
+        category: "Martial arts and self defense",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+
+    // 18. Dance and movement (8)
+    {
+        id: "dance_01",
+        title: "Learn the Basic Two-Step",
+        description: "Put on a song with a clear beat and practice the two-step: step-touch side to side in time with the music, adding a gentle bounce and arm swing. 3 minutes continuous.",
+        category: "Dance and movement",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "dance_02",
+        title: "Freestyle to One Song (3 Minutes)",
+        description: "Choose one song and move freely for its entire length without stopping. Explore different levels (high, mid, low) and directions; no moves are wrong.",
+        category: "Dance and movement",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "dance_03",
+        title: "Practice the Grapevine Step",
+        description: "Step side, cross behind, step side, touch. Repeat the grapevine traveling left and right for 2 minutes, staying light on your feet and in rhythm.",
+        category: "Dance and movement",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "dance_04",
+        title: "Body Isolation Warm-Up",
+        description: "Move each body part independently: head, shoulders, ribcage, and hips in isolation circles. Spend 30 seconds per part to improve body awareness and control.",
+        category: "Dance and movement",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "dance_05",
+        title: "Learn a 30-Second Choreography Phrase",
+        description: "Pick a short dance tutorial online and memorize a 30-second movement phrase. Perform it from start to finish without pausing, then add your own flair.",
+        category: "Dance and movement",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "dance_06",
+        title: "Floorwork Roll Sequence",
+        description: "Practice rolling safely from standing to the floor and back up in both directions (forward and backward shoulder rolls). Link three rolls together smoothly.",
+        category: "Dance and movement",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "dance_07",
+        title: "Improvisational Mirror Dance",
+        description: "Stand before a mirror and imitate your own reflection in slow motion, exaggerating every gesture. Move for 2 minutes, treating your reflection as the leader.",
+        category: "Dance and movement",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "dance_08",
+        title: "Spin and Turn Practice (Pirouette Prep)",
+        description: "Practice spotting: fix your eyes on a single point, whip your head around at the last moment, and practice quarter, half, and full turns on one foot.",
+        category: "Dance and movement",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+
+    // 19. Yoga and flexibility (8)
+    {
+        id: "yoga_01",
+        title: "Sun Salutation A Flow (5 Rounds)",
+        description: "Move through Sun Salutation A (Mountain, Forward Fold, Half Lift, Plank, Chaturanga, Upward Dog, Downward Dog) linking breath to movement for 5 rounds.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "yoga_02",
+        title: "Hold Downward Dog for 2 Minutes",
+        description: "Press into Downward-Facing Dog: hands shoulder-width, feet hip-width, hips high, heels pressing toward the floor. Breathe deeply for 2 continuous minutes.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "yoga_03",
+        title: "Seated Forward Fold Stretch",
+        description: "Sit with legs extended, hinge at the hips, and reach for your feet. Hold for 2 minutes with a relaxed spine, breathing into the hamstrings and lower back.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "yoga_04",
+        title: "Cat-Cow Spinal Mobility (2 Minutes)",
+        description: "On all fours, alternate between arching (Cow) and rounding (Cat) your spine with each breath. Move slowly and deliberately for 2 minutes.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "yoga_05",
+        title: "Pigeon Pose Hip Opener (2 Minutes Per Side)",
+        description: "From Downward Dog, bring one knee forward behind the wrist and extend the other leg back. Hold Pigeon Pose for 2 minutes per side to open the hips.",
+        category: "Yoga and flexibility",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "yoga_06",
+        title: "Tree Pose Balance Practice",
+        description: "Stand on one leg, place the opposite foot on your inner thigh or calf (not the knee), hands at heart center. Hold for 1 minute per side, eyes fixed on a point.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "yoga_07",
+        title: "Cobra and Upward Dog Strengthener",
+        description: "Lie prone and lift your chest into Cobra, then press up through Upward-Facing Dog. Flow between them for 3 sets of 5 repetitions, engaging the back muscles.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "yoga_08",
+        title: "Full-Body Yin Stretch Sequence",
+        description: "Hold passive stretches (butterfly, child's pose, supine twist, legs-up-wall) for 2 minutes each. Focus on relaxing the muscles and breathing into the connective tissue.",
+        category: "Yoga and flexibility",
+        difficulty: "Beginner",
+        duration: 20
+    },
+
+    // 20. Swimming and aquatics (8)
+    {
+        id: "swim_01",
+        title: "Tread Water for 2 Minutes",
+        description: "In a pool, stay upright and afloat using a gentle eggbeater kick and sculling hands for 2 continuous minutes without touching the bottom or walls.",
+        category: "Swimming and aquatics",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "swim_02",
+        title: "Front Crawl 4 Lengths",
+        description: "Swim 4 lengths (100 meters) of front crawl with bilateral breathing (every 3 strokes). Focus on body rotation and a high elbow recovery.",
+        category: "Swimming and aquatics",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "swim_03",
+        title: "Kickboard Kick Set (200 Meters)",
+        description: "Hold a kickboard and kick 200 meters with a flutter kick, face in or out of the water, keeping hips high and legs relatively straight from the hip.",
+        category: "Swimming and aquatics",
+        difficulty: "Beginner",
+        duration: 20
+    },
+    {
+        id: "swim_04",
+        title: "Backstroke 2 Lengths",
+        description: "Swim 2 lengths of backstroke, keeping your head still, ears in the water, and rotating shoulders with each arm recovery. Aim for smooth, even strokes.",
+        category: "Swimming and aquatics",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "swim_05",
+        title: "Breaststroke Timing Drill",
+        description: "Practice the breaststroke pull-breathe-kick-glide sequence for 4 lengths, emphasizing the glide phase and timing the breath with the pull.",
+        category: "Swimming and aquatics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "swim_06",
+        title: "Deep-Water Bobbing",
+        description: "In deep water, repeatedly sink to the bottom, push off, and exhale fully while surfacing. Perform 10 bobs to build comfort and breath control underwater.",
+        category: "Swimming and aquatics",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "swim_07",
+        title: "Open Turn Practice at Wall",
+        description: "Swim into the wall, touch with both hands, tuck, plant your feet, and push off in a streamlined position. Repeat 5 times focusing on a tight tuck.",
+        category: "Swimming and aquatics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "swim_08",
+        title: "Float and Relax (Dead Man's Float)",
+        description: "In chest-deep water, take a breath, tuck your knees, and let your body float face-down in a relaxed dead-man's float for 30 seconds, then stand calmly.",
+        category: "Swimming and aquatics",
+        difficulty: "Beginner",
+        duration: 10
+    },
+
+    // 21. Cycling (8)
+    {
+        id: "bike_01",
+        title: "Ride 5 Kilometers at a Steady Pace",
+        description: "Cycle 5 km on a road or path at a comfortable, sustainable speed. Focus on smooth pedaling circles and shifting gears to maintain cadence.",
+        category: "Cycling",
+        difficulty: "Beginner",
+        duration: 30
+    },
+    {
+        id: "bike_02",
+        title: "Hill Repeats (3 Climbs)",
+        description: "Find a short hill and ride up it 3 times, recovering by coasting or spinning down. Stay seated for the first two climbs, stand for the third.",
+        category: "Cycling",
+        difficulty: "Intermediate",
+        duration: 30
+    },
+    {
+        id: "bike_03",
+        title: "Emergency Stop Practice",
+        description: "In an empty parking lot, accelerate to a moderate speed and practice stopping quickly using both brakes evenly, shifting weight back over the rear wheel.",
+        category: "Cycling",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "bike_04",
+        title: "Single-Leg Pedaling Drill",
+        description: "On a stationary bike or trainer, unclip one foot and pedal with only the other leg for 30 seconds, focusing on a smooth circular stroke. Switch legs; repeat 3x per side.",
+        category: "Cycling",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "bike_05",
+        title: "Group Ride Pace Line (20 Minutes)",
+        description: "Ride with others in a rotating pace line, taking short pulls at the front and tucking in behind to draft. Communicate with hand signals and callouts.",
+        category: "Cycling",
+        difficulty: "Intermediate",
+        duration: 30
+    },
+    {
+        id: "bike_06",
+        title: "Track Stand Balance",
+        description: "Practice balancing stationary on your bike (track stand) by balancing pressure on pedals and slight handlebar adjustments. Hold for 30 seconds without putting a foot down.",
+        category: "Cycling",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "bike_07",
+        title: "Cornering Drill (Figure-8)",
+        description: "Ride figure-8s around two markers, leaning the bike under you while keeping your body more upright. Look through the turn and brake before the corner.",
+        category: "Cycling",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "bike_08",
+        title: "Bike Safety Check (ABC Quick Check)",
+        description: "Perform an Air-Brakes-Chain-Cranks-Quick release safety inspection of your bike. Inflate tires, test brakes, lubricate chain, and check wheel security before riding.",
+        category: "Cycling",
+        difficulty: "Beginner",
+        duration: 10
+    },
+
+    // 22. Running and track (8)
+    {
+        id: "run_01",
+        title: "400-Meter Track Lap",
+        description: "Run one lap (400 m) on a track or measured loop at a controlled effort. Focus on even pacing and relaxed shoulders; record your lap time.",
+        category: "Running and track",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "run_02",
+        title: "Interval Sprint Workout (8 x 30 Seconds)",
+        description: "Sprint hard for 30 seconds, walk/jog for 90 seconds, and repeat 8 times. Give near-maximum effort on each sprint while maintaining form.",
+        category: "Running and track",
+        difficulty: "Advanced",
+        duration: 30
+    },
+    {
+        id: "run_03",
+        title: "Long Slow Distance Run (5 Kilometers)",
+        description: "Run 5 km at an easy, conversational pace where you can speak in full sentences. Prioritize time on feet over speed.",
+        category: "Running and track",
+        difficulty: "Intermediate",
+        duration: 45
+    },
+    {
+        id: "run_04",
+        title: "Strides and Form Drills",
+        description: "After a warm-up, run 4 x 100-meter strides (gradually accelerating to near-sprint, then decelerating) focusing on tall posture and quick foot turnover.",
+        category: "Running and track",
+        difficulty: "Beginner",
+        duration: 20
+    },
+    {
+        id: "run_05",
+        title: "Hill Sprint Repeats (6 x Short Hill)",
+        description: "Sprint up a steep hill for 10-15 seconds, walk back down for full recovery, and repeat 6 times. Drive your knees and pump your arms on each ascent.",
+        category: "Running and track",
+        difficulty: "Advanced",
+        duration: 30
+    },
+    {
+        id: "run_06",
+        title: "Negative Split Mile",
+        description: "Run one mile where each quarter-mile lap is slightly faster than the previous one. Finish strong while maintaining control throughout.",
+        category: "Running and track",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "run_07",
+        title: "Running Cadence Count",
+        description: "Run for 1 minute and count how many times one foot strikes the ground. Aim for ~90 per foot (180 total). Adjust your step length, not speed, to hit the target.",
+        category: "Running and track",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "run_08",
+        title: "Recovery Jog with Dynamic Stretch",
+        description: "Jog easily for 15 minutes, then perform dynamic stretches (leg swings, walking lunges, high knees, butt kicks) for 5 minutes to aid recovery.",
+        category: "Running and track",
+        difficulty: "Beginner",
+        duration: 25
+    },
+
+    // 23. Calisthenics (8)
+    {
+        id: "calis_01",
+        title: "Hold a Hollow Body for 60 Seconds",
+        description: "Lie on your back, press your lower back into the floor, lift shoulders and legs a few inches off the ground, and hold the hollow-body shape for 60 seconds.",
+        category: "Calisthenics",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "calis_02",
+        title: "Pull-Up Progression (Negatives)",
+        description: "Jump or step to the top of a pull-up bar, then lower yourself as slowly as possible over 5 seconds. Perform 5 negative pull-ups with full range of motion.",
+        category: "Calisthenics",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "calis_03",
+        title: "Dip Station 3 Sets of 8",
+        description: "Perform 3 sets of 8 parallel-bar dips, lowering until shoulders are below elbows and pressing to full lockout. Keep shoulders depressed and stable.",
+        category: "Calisthenics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "calis_04",
+        title: "Pistol Squat Assisted Practice",
+        description: "Practice single-leg squats holding onto a sturdy object for balance. Lower slowly on one leg, sit back, and stand up. 5 reps per leg.",
+        category: "Calisthenics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "calis_05",
+        title: "L-Sit Hold on Parallettes or Floor",
+        description: "Support yourself on your hands with legs extended straight out in front at hip height. Hold an L-sit for 10 seconds; repeat 3 times with rest.",
+        category: "Calisthenics",
+        difficulty: "Advanced",
+        duration: 10
+    },
+    {
+        id: "calis_06",
+        title: "Australian Pull-Ups (Body Rows)",
+        description: "Under a low bar or table, pull your chest to the bar with a straight body and heels on the ground. 3 sets of 10 reps, squeezing shoulder blades together.",
+        category: "Calisthenics",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "calis_07",
+        title: "Wall Handstand Kick-Up Practice",
+        description: "Kick up into a handstand against a wall, hold with a tight body for 10 seconds, and come down with control. Practice 5 kick-ups per side.",
+        category: "Calisthenics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "calis_08",
+        title: "Muscle-Up Transition Drill",
+        description: "On a low bar, practice the transition from pull to dip by pulling explosively and leaning your chest over the bar. Use a band or box for assistance. 5 attempts.",
+        category: "Calisthenics",
+        difficulty: "Advanced",
+        duration: 20
+    },
+
+    // 24. Outdoor and adventure (8)
+    {
+        id: "outdoor_01",
+        title: "3-Kilometer Nature Hike",
+        description: "Hike 3 km on a trail or natural path, observing terrain underfoot and scenery around you. Wear sturdy shoes and carry water; leave no trace.",
+        category: "Outdoor and adventure",
+        difficulty: "Beginner",
+        duration: 50
+    },
+    {
+        id: "outdoor_02",
+        title: "Basic Map Orientation",
+        description: "With a topographic map and compass, orient the map to north using terrain features, then identify your location and a nearby landmark.",
+        category: "Outdoor and adventure",
+        difficulty: "Beginner",
+        duration: 20
+    },
+    {
+        id: "outdoor_03",
+        title: "Rock Climbing Boulder Problem (3 Attempts)",
+        description: "At a climbing gym or boulder, attempt 3 different problems (routes) focusing on foot placement, body positioning, and using your legs to push up.",
+        category: "Outdoor and adventure",
+        difficulty: "Intermediate",
+        duration: 30
+    },
+    {
+        id: "outdoor_04",
+        title: "Build and Test a Basic Shelter Tarp",
+        description: "Using a tarp, rope, and trees, rig a simple A-frame or lean-to shelter. Spend 5 minutes inside testing its coverage and stability.",
+        category: "Outdoor and adventure",
+        difficulty: "Beginner",
+        duration: 25
+    },
+    {
+        id: "outdoor_05",
+        title: "Trail Run Intervals",
+        description: "Run on uneven trail terrain for 20 minutes, alternating 1 minute of faster running with 2 minutes of easy jogging to navigate roots and rocks.",
+        category: "Outdoor and adventure",
+        difficulty: "Intermediate",
+        duration: 30
+    },
+    {
+        id: "outdoor_06",
+        title: "Identify 5 Local Plants or Trees",
+        description: "On a walk, find and identify 5 different plant or tree species using a field guide or app. Note their leaves, bark, and any distinguishing features.",
+        category: "Outdoor and adventure",
+        difficulty: "Beginner",
+        duration: 30
+    },
+    {
+        id: "outdoor_07",
+        title: "Orienteering Course (3 Control Points)",
+        description: "Set up 3 control points in a park and navigate between them using only a map and compass, recording the time to find each one.",
+        category: "Outdoor and adventure",
+        difficulty: "Intermediate",
+        duration: 45
+    },
+    {
+        id: "outdoor_08",
+        title: "Sunset/Sunrise Outdoor Meditation",
+        description: "Sit quietly outdoors at sunrise or sunset for 10 minutes, observing light changes, temperature, sounds, and your breath without distraction.",
+        category: "Outdoor and adventure",
+        difficulty: "Beginner",
+        duration: 15
+    },
+
+    // 25. Team sports (8)
+    {
+        id: "team_01",
+        title: "Basketball Shooting Form (25 Shots)",
+        description: "Take 25 shots from different spots near the basket, focusing on consistent form: knees bent, elbow under the ball, follow-through with wrist snap.",
+        category: "Team sports",
+        difficulty: "Beginner",
+        duration: 20
+    },
+    {
+        id: "team_02",
+        title: "Soccer Juggling (100 Touches)",
+        description: "Keep a soccer ball in the air using feet, thighs, and chest for 100 total touches without letting it hit the ground. Track your personal best.",
+        category: "Team sports",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "team_03",
+        title: "Volleyball Passing Drill",
+        description: "With a partner or against a wall, practice forearm passes (bumps) setting the ball to a target. Aim for 20 consecutive controlled passes.",
+        category: "Team sports",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "team_04",
+        title: "Relay Sprint Handoffs",
+        description: "With a partner, practice sprint baton handoffs over 4 x 50-meter relays, focusing on passing the baton within the exchange zone at full speed.",
+        category: "Team sports",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "team_05",
+        title: "Defensive Slides (Basketball)",
+        description: "Slide laterally in a defensive stance (knees bent, arms wide) across the width of a court or marked area for 1 minute without crossing your feet.",
+        category: "Team sports",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "team_06",
+        title: "Keep-Away Possession Game",
+        description: "Play 3-v-1 keep-away in a small grid: 3 attackers maintain possession while 1 defender tries to steal. Play for 5 minutes, rotating the defender.",
+        category: "Team sports",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "team_07",
+        title: "Free Throw Routine Practice",
+        description: "Develop and repeat a consistent free throw routine (dribble, breath, shoot) for 10 attempts, tracking how many you make and adjusting your form.",
+        category: "Team sports",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "team_08",
+        title: "Small-Sided Game (15 Minutes)",
+        description: "Play a 3-v-3 or 4-v-4 small-sided game (soccer, basketball, or ultimate) for 15 minutes with continuous play and minimal stoppages.",
+        category: "Team sports",
+        difficulty: "Intermediate",
+        duration: 25
+    },
+
+    // 26. Racket sports (8)
+    {
+        id: "racket_01",
+        title: "Forehand Groundstroke Rally (20 Shots)",
+        description: "With a partner or wall, hit 20 consecutive forehand groundstrokes in a rally, focusing on early preparation, contact in front, and full follow-through.",
+        category: "Racket sports",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "racket_02",
+        title: "Serve Toss Consistency (20 Tosses)",
+        description: "Practice your service toss 20 times without hitting the ball, aiming to place it in the same spot every time slightly in front and to the side.",
+        category: "Racket sports",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "racket_03",
+        title: "Backhand Slice Practice",
+        description: "Hit 15 backhand slice shots, keeping the racket face open and cutting under the ball to produce backspin and a low trajectory.",
+        category: "Racket sports",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "racket_04",
+        title: "Volley Reflex Drill at Net",
+        description: "Stand at the net and volley 15 quick balls fed to you, punching the ball forward with a short backswing and firm wrist.",
+        category: "Racket sports",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "racket_05",
+        title: "Footwork Shadow Drill (3 Minutes)",
+        description: "Move side-to-side and forward-backward in an athletic stance mimicking match movement for 3 minutes, always returning to a ready position.",
+        category: "Racket sports",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "racket_06",
+        title: "Overhead Smash Technique",
+        description: "Practice the overhead smash motion 10 times: turn sideways, racket back, contact high in front, and snap through the ball. Use a partner feeding lobs.",
+        category: "Racket sports",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "racket_07",
+        title: "Drop Shot Touch Drill",
+        description: "Hit 10 soft drop shots that land just over the net, using a gentle grip and abbreviated swing to place the ball precisely.",
+        category: "Racket sports",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "racket_08",
+        title: "Mini Match Tiebreak (First to 7)",
+        description: "Play a tiebreak to 7 points against a partner, serving alternately and calling your own lines. Play honestly and focus on placement over power.",
+        category: "Racket sports",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+
+    // 27. Balance and coordination (8)
+    {
+        id: "balance_01",
+        title: "Single-Leg Stand with Eyes Closed (30 Seconds)",
+        description: "Stand on one leg with your eyes closed and hold for 30 seconds. Switch legs. Use a wall nearby for safety if you begin to wobble.",
+        category: "Balance and coordination",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "balance_02",
+        title: "Agility Ladder Quick Feet",
+        description: "Run through an agility ladder (or draw one with chalk) using one-foot-in-each-square, two-foot hops, and lateral shuffles for 3 minutes total.",
+        category: "Balance and coordination",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "balance_03",
+        title: "Slackline Balance Attempt",
+        description: "Walk across a slackline or a low narrow beam, using your arms for balance. Aim to cross its full length without stepping off.",
+        category: "Balance and coordination",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "balance_04",
+        title: "Cone Weave (Carioca and Shuffle)",
+        description: "Set 5 cones in a line and weave through them using carioca (crossing feet laterally) and side shuffles. Complete 6 round trips.",
+        category: "Balance and coordination",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "balance_05",
+        title: "BOSU or Pillow Balance Squat",
+        description: "Stand on an unstable surface (BOSU trainer, pillow, or folded towel) and perform 10 slow bodyweight squats without touching the ground with your hands.",
+        category: "Balance and coordination",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "balance_06",
+        title: "Juggle Three Balls for 30 Catches",
+        description: "Practice the 3-ball cascade and count consecutive clean catches until you reach 30 without a drop. Take breaks as needed.",
+        category: "Balance and coordination",
+        difficulty: "Intermediate",
+        duration: 20
+    },
+    {
+        id: "balance_07",
+        title: "Single-Leg Romanian Deadlift",
+        description: "Balance on one leg, hinge at the hips, and extend the other leg behind you while reaching toward the ground. 8 reps per leg with control.",
+        category: "Balance and coordination",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "balance_08",
+        title: "Proprioception Ankle Alphabet",
+        description: "Standing on one leg, trace the alphabet in the air with your free foot, moving slowly through each letter. Switch legs and repeat A-Z.",
+        category: "Balance and coordination",
+        difficulty: "Beginner",
+        duration: 10
+    },
+
+    // 28. Breathwork and recovery (8)
+    {
+        id: "breath_01",
+        title: "Box Breathing (5 Minutes)",
+        description: "Inhale 4 seconds, hold 4, exhale 4, hold 4; repeat for 5 minutes. Use this to calm the nervous system and improve focus.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "breath_02",
+        title: "Cold Exposure Shower Finish",
+        description: "End your shower with 2 minutes of cold water, focusing on slow, controlled breathing rather than gasping. Note your body's response afterward.",
+        category: "Breathwork and recovery",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "breath_03",
+        title: "Foam Rolling Full Body",
+        description: "Spend 10 minutes foam rolling major muscle groups (calves, quads, IT band, back, lats), pausing on tender spots for 30 seconds each.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "breath_04",
+        title: "Alternate Nostril Breathing (Nadi Shodhana)",
+        description: "Using your thumb and ring finger, alternate closing nostrils while breathing in one side and out the other for 5 minutes. Keep the breath smooth and even.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "breath_05",
+        title: "Sauna Session with Hydration",
+        description: "Spend 10-15 minutes in a sauna or steam room, drinking water before and after. Practice slow breathing and observe your heart rate settle.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 20
+    },
+    {
+        id: "breath_06",
+        title: "4-7-8 Relaxation Breath (8 Cycles)",
+        description: "Inhale for 4 seconds, hold for 7, exhale forcefully for 8. Repeat 8 cycles to downshift into a relaxed state before bed or after stress.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "breath_07",
+        title: "Diaphragmatic Breathing Practice",
+        description: "Lie on your back with one hand on your chest and one on your belly. Breathe so only the belly hand moves for 5 minutes, training diaphragmatic breathing.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "breath_08",
+        title: "Post-Workout Static Stretch Routine",
+        description: "After any physical activity, hold static stretches for hamstrings, quads, chest, and shoulders for 30 seconds each, breathing deeply into the stretch.",
+        category: "Breathwork and recovery",
+        difficulty: "Beginner",
+        duration: 15
+    },
+
+    // 29. Gymnastics (8)
+    {
+        id: "gym_01",
+        title: "Forward and Backward Roll",
+        description: "On a mat, perform 5 smooth forward rolls and 5 backward rolls, tucking your chin and rolling along your spine rather than your neck.",
+        category: "Gymnastics",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "gym_02",
+        title: "Cartwheel on Both Sides",
+        description: "Practice cartwheels leading with each hand, keeping arms straight and legs in a V-shape overhead. Land facing the direction you started.",
+        category: "Gymnastics",
+        difficulty: "Beginner",
+        duration: 15
+    },
+    {
+        id: "gym_03",
+        title: "Handstand Hold Against Wall",
+        description: "Kick into a handstand against a wall with a tight, hollow body. Hold for 30 seconds, then come down with control. Repeat 3 times.",
+        category: "Gymnastics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "gym_04",
+        title: "Bridge / Backbend Hold",
+        description: "Lie on your back, place hands by your ears, and press up into a bridge. Hold for 20 seconds, pushing shoulders over wrists and hips high.",
+        category: "Gymnastics",
+        difficulty: "Beginner",
+        duration: 10
+    },
+    {
+        id: "gym_05",
+        title: "Round-Off Rebound",
+        description: "Practice a round-off: cartwheel into a snap-down, landing on both feet and immediately rebounding upward. Perform 5 clean round-offs.",
+        category: "Gymnastics",
+        difficulty: "Intermediate",
+        duration: 15
+    },
+    {
+        id: "gym_06",
+        title: "Front Support on Parallettes",
+        description: "Support your body on parallettes or sturdy bars with arms straight, shoulders depressed, and legs together. Hold a front support for 30 seconds.",
+        category: "Gymnastics",
+        difficulty: "Intermediate",
+        duration: 10
+    },
+    {
+        id: "gym_07",
+        title: "Cast to Handstand Drill (on Bar)",
+        description: "From a hanging support on a low bar, cast your hips up and extend to a handstand position with a spotter or band assistance. 3 attempts.",
+        category: "Gymnastics",
+        difficulty: "Advanced",
+        duration: 20
+    },
+    {
+        id: "gym_08",
+        title: "Split Stretch Routine",
+        description: "Warm up thoroughly, then work toward front and straddle splits. Hold each split stretch for 60 seconds, breathing deeply and never forcing pain.",
+        category: "Gymnastics",
+        difficulty: "Beginner",
+        duration: 20
     }
 ];
 

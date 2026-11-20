@@ -3,7 +3,7 @@
 A native desktop productivity and visual analytics ecosystem built for **KDE Plasma 6** on Ubuntu Linux.
 
 This repository provides two complete, complementary desktop solutions:
-1. **KDE Productivity Suite**: Four independent, native Plasma 6 widgets (**Quick Capture**, **Habit Tracker**, **Random Challenge**, and **Task & Goal Manager**).
+1. **KDE Productivity Suite**: Five independent, native Plasma 6 widgets (**Quick Capture**, **Habit Tracker**, **Random Challenge**, **Journal Prompts**, and **Task & Goal Manager**).
 2. **TimeTrack Visual Analytics**: A comprehensive time-tracking analytics solution consisting of a **Compact Plasma 6 Widget** and a full **Desktop Analytics Application** (PyQt6 + QML) visualizing computer usage from `desktop-timetracker`.
 
 ---
@@ -25,6 +25,10 @@ This repository provides two complete, complementary desktop solutions:
   - Deterministic Daily Mission mode or Random Explorer.
   - Difficulty filters (Beginner, Intermediate, Advanced) and estimated durations.
   - Completed challenge history, skip, delete, "Clear All", and "Restore Default Challenges".
+- **Journal Prompts** (`org.kde.plasma.productivitysuite.journalprompts`):
+  - Minimal daily random journaling prompt widget (deep, funny, grateful, creative, relationships, work, morning, evening, wild/weird, quick check-in).
+  - 90+ bundled prompts across 11 flavours, rotating once per day.
+  - Mark prompts as done or favourite them; copy a prompt to the clipboard.
 - **Task & Goal Manager** (`org.kde.plasma.productivitysuite.taskgoalmanager`):
   - Daily priority task tracking (Urgent, High, Medium, Low) with deadline sorting.
   - Long-term hierarchical goals with weighted milestone tracking and automatic completion percentages.
@@ -143,7 +147,7 @@ timetrack export --date $(date +%Y-%m-%d)
 From the repository root, execute the automated installer script:
 
 ```bash
-# Install all 5 widgets (4 Productivity Suite + TimeTrack Analytics)
+# Install all 6 widgets (5 Productivity Suite + TimeTrack Analytics)
 ./scripts/install-all.sh
 ```
 
@@ -156,6 +160,7 @@ This script:
 - `org.kde.plasma.productivitysuite.quickcapture`
 - `org.kde.plasma.productivitysuite.habittracker`
 - `org.kde.plasma.productivitysuite.randomchallenge`
+- `org.kde.plasma.productivitysuite.journalprompts`
 - `org.kde.plasma.productivitysuite.taskgoalmanager`
 - `org.kde.plasma.timetrackanalytics`
 
@@ -166,6 +171,7 @@ This script:
    - **Quick Capture**
    - **Habit Tracker**
    - **Random Challenge**
+   - **Journal Prompts**
    - **Task & Goal Manager**
    - **TimeTrack Analytics**
 4. Drag and drop them into your panel or onto your desktop.
@@ -189,6 +195,17 @@ Click on the **TimeTrack Analytics** widget on your panel or desktop and click:
 
 #### Method C: Via KDE Application Launcher
 The installer configures `~/.local/share/applications/org.kde.timetrackanalytics.desktop`. You can launch **TimeTrack Visual Analytics** directly from the KDE Kickoff application menu.
+
+---
+
+### Journal Prompts Widget Usage
+
+**Journal Prompts** (`org.kde.plasma.productivitysuite.journalprompts`) is a minimal daily journaling widget.
+
+- **Panel view**: Shows only a minimal icon (no text). Click it to open the full prompt view.
+- **Daily rotation**: A new random prompt is served each day across 11 flavours (Deep & Reflective, Funny & Light, Gratitude, Self-Discovery, Creative, Relationships, Work & Career, Morning, Evening, Wild & Weird, Quick Check-In).
+- **Actions**: Mark a prompt as Done, copy it to clipboard, or favourite it.
+- **Favourites**: Click the star (⭐) to favourite a prompt. Open the favourites list from the header to view and load any favourited prompt.
 
 ---
 

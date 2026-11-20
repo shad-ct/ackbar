@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "KDE Productivity Suite Contributors"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Minimal daily random journaling prompts — deep, funny, grateful, creative and everything in between",
+        "FormFactors": [
+            "desktop",
+            "panel"
+        ],
+        "Icon": "accessories-text-editor",
+        "Id": "org.kde.plasma.productivitysuite.journalprompts",
+        "License": "MIT",
+        "Name": "Journal Prompts",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
+}
