@@ -69,29 +69,6 @@ Item {
             }
 
             PlasmaComponents.Button {
-                text: i18n("Clear All")
-                icon.name: "edit-clear-all"
-                visible: root.habitsList.length > 0
-                flat: true
-                Layout.preferredHeight: 28
-                onClicked: {
-                    Storage.clearAllHabits(plasmoid);
-                    root.reloadData();
-                }
-            }
-
-            PlasmaComponents.Button {
-                text: i18n("Restore Defaults")
-                icon.name: "view-refresh"
-                flat: true
-                Layout.preferredHeight: 28
-                onClicked: {
-                    Storage.restoreDefaultHabits(plasmoid);
-                    root.reloadData();
-                }
-            }
-
-            PlasmaComponents.Button {
                 text: i18n("+ Add")
                 icon.name: "list-add"
                 Layout.preferredHeight: 28
@@ -157,6 +134,8 @@ Item {
                 anchors.fill: parent
                 visible: root.habitsList.length > 0
                 clip: true
+                verticalScrollBarPolicy: QQC2.ScrollBar.AlwaysOff
+                horizontalScrollBarPolicy: QQC2.ScrollBar.AlwaysOff
 
                 ListView {
                     id: habitsListView
