@@ -130,12 +130,10 @@ Item {
                 iconName: "user-identity"
             }
 
-            PlasmaComponents.ScrollView {
+            Item {
                 anchors.fill: parent
                 visible: root.habitsList.length > 0
                 clip: true
-                verticalScrollBarPolicy: QQC2.ScrollBar.AlwaysOff
-                horizontalScrollBarPolicy: QQC2.ScrollBar.AlwaysOff
 
                 ListView {
                     id: habitsListView
