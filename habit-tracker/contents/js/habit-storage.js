@@ -63,15 +63,16 @@ function loadHabits(plasmoid) {
     if (!plasmoid || !plasmoid.configuration) {
         return [];
     }
-    // Only seed on initial install if hasSeeded is false
     var hasSeeded = plasmoid.configuration.hasSeeded;
-    if (!hasSeeded) {
+    var raw = plasmoid.configuration.habitsData;
+
+    // Seed defaults if never seeded OR if habits data is empty
+    if (!hasSeeded || !raw || raw === "[]") {
         plasmoid.configuration.hasSeeded = true;
         saveHabits(plasmoid, DEFAULT_HABITS);
         return DEFAULT_HABITS;
     }
-    var raw = plasmoid.configuration.habitsData;
-    if (!raw) return [];
+
     try {
         var list = JSON.parse(raw);
         if (Array.isArray(list)) {
