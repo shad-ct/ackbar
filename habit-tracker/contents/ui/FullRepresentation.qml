@@ -122,42 +122,48 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Shared.EmptyState {
-                visible: root.habitsList.length === 0
-                anchors.centerIn: parent
-                title: i18n("No habits created")
-                description: i18n("Click '+ Add' above to begin building your habits.")
-                iconName: "user-identity"
-            }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: 0
 
-            ListView {
-                id: habitsListView
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                width: parent.width
-                spacing: 6
-                model: root.habitsList
+                Shared.EmptyState {
+                    visible: root.habitsList.length === 0
+                    Layout.alignment: Qt.AlignCenter
+                    title: i18n("No habits created")
+                    description: i18n("Click '+ Add' above to begin building your habits.")
+                    iconName: "user-identity"
+                }
 
-                    delegate: HabitRow {
-                        width: habitsListView.width
-                        height: implicitHeight
-                        habitData: modelData
-                        isCompletedToday: StreakCalc.isHabitCompletedOn(modelData, StreakCalc.toDateKey(new Date()))
-                        streakInfo: StreakCalc.calculateHabitStreak(modelData)
-                        showStreak: typeof plasmoid !== "undefined" && plasmoid.configuration ? plasmoid.configuration.showStreakBadges : true
+                    ListView {
+                        id: habitsListView
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        width: parent.width
+                        spacing: 6
+                        model: root.habitsList
 
-                        onToggledToday: function(id) {
-                            Storage.toggleCompletion(plasmoid, id, StreakCalc.toDateKey(new Date()));
-                            root.reloadData();
-                        }
+                        delegate: HabitRow {
+                            width: habitsListView.width
+                            height: implicitHeight
+                            habitData: modelData
+                            isCompletedToday: StreakCalc.isHabitCompletedOn(modelData, StreakCalc.toDateKey(new Date()))
+                            streakInfo: StreakCalc.calculateHabitStreak(modelData)
+                            showStreak: typeof plasmoid !== "undefined" && plasmoid.configuration ? plasmoid.configuration.showStreakBadges : true
 
-                        onEditRequested: function(habit) {
-                            habitDialog.openForEdit(habit);
-                        }
+                            onToggledToday: function(id) {
+                                Storage.toggleCompletion(plasmoid, id, StreakCalc.toDateKey(new Date()));
+                                root.reloadData();
+                            }
 
-                        onDeleteRequested: function(id) {
-                            Storage.deleteHabit(plasmoid, id);
-                            root.reloadData();
+                            onEditRequested: function(habit) {
+                                habitDialog.openForEdit(habit);
+                            }
+
+                            onDeleteRequested: function(id) {
+                                Storage.deleteHabit(plasmoid, id);
+                                root.reloadData();
+                            }
                         }
                     }
                 }
